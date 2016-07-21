@@ -4,7 +4,7 @@
   "description": "View stack router",
   "main": "index.js",
   "scripts": {
-    "test": "browserify ./test.js | browser-run"
+    "test": "node ./test.js"
   },
   "repository": {
     "type": "git",
@@ -27,8 +27,5 @@
     "tiny-uuid": "^1.0.0",
     "url-pattern": "^1.0.1"
   },
-  "devDependencies": {
-    "browser-run": "^3.2.0",
-    "browserify": "^13.0.1"
-  }
+  "devDependencies": {}
 }
