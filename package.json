@@ -1,0 +1,34 @@
+{
+  "name": "view-stack",
+  "version": "1.0.0",
+  "description": "View stack router",
+  "main": "index.js",
+  "scripts": {
+    "test": "browserify ./test.js | browser-run"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kristoferjoseph/view-stack.git"
+  },
+  "keywords": [
+    "view",
+    "stack",
+    "router"
+  ],
+  "author": "@dam",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/kristoferjoseph/view-stack/issues"
+  },
+  "homepage": "https://github.com/kristoferjoseph/view-stack#readme",
+  "dependencies": {
+    "async": "^2.0.0",
+    "query-string": "^4.2.2",
+    "tiny-uuid": "^1.0.0",
+    "url-pattern": "^1.0.1"
+  },
+  "devDependencies": {
+    "browser-run": "^3.2.0",
+    "browserify": "^13.0.1"
+  }
+}
