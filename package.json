@@ -4,7 +4,8 @@
   "description": "View stack router",
   "main": "index.js",
   "scripts": {
-    "test": "node ./test.js"
+    "test": "node ./test.js",
+    "dist": "browserify ./index.js | uglifyjs --compress --mangle --screw-ie8 > view-stack.min.js"
   },
   "repository": {
     "type": "git",
@@ -27,5 +28,8 @@
     "tiny-uuid": "^1.0.0",
     "url-pattern": "^1.0.1"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "browserify": "^13.0.1",
+    "uglify-js": "^2.7.0"
+  }
 }

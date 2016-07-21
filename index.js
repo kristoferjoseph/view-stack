@@ -1,6 +1,5 @@
 var queryString = require('query-string')
 var Pattern     = require('url-pattern')
-var uuid        = require('tiny-uuid')
 var parallel    = require('async').parallel
 //Object to store keyed routes in
 var routes = {}
@@ -43,10 +42,8 @@ function defendAgainstDefault(component) {
   }
   return component
 }
-/*
- * This function takes an Array of routes and
- * registers them.
- */
+//This function takes an Array of routes and
+// registers them.
 function register(routes) {
   testRoutes(routes)
   testRoutesArray(routes)
@@ -70,49 +67,47 @@ function testRoutesArray(routes) {
     )
   }
 }
-/*
- * This function adds a unique route.
- * full routes have the unique signature of:
- * route:layer:component
- * A route can have many layers and
- *  layers can have many component,
- *  but a layer can only have one component per route
- *  Options: Object with the signature:
- *    route: String of url or paramaterized url
- *    layer: String of the name of the target layer
- *    component: Function to call when loading the component takes a callback
- *    props: Object of props to pass to the component
- *
- * INPUT
- * -------
- * options = {
- *  route: '/',
- *  layer: 'screens',
- *  component: function(callback) {
- *    callback(null, require('../components/foo.js')
- *  },
- *  props: {
- *    title: 'TODAY'
- * }
- *
- * OUTPUT
- * -------
- *
- * '/': {
- *   'screens': {
- *      component: function(callback) {
- *        callback(null, require('../components/bar.js')
- *      },
- *      props: {
- *        title: 'TODAY'
- *       }
- *   }
- * }
- *
- * A route can target multiple layers.
- * A layer can only have one component per route.
- * This data structure _enforces_ that.
- */
+// This function adds a unique route.
+// full routes have the unique signature of:
+// route:layer:component
+// A route can have many layers and
+//  layers can have many component,
+//  but a layer can only have one component per route
+//  Options: Object with the signature:
+//    route: String of url or paramaterized url
+//    layer: String of the name of the target layer
+//    component: Function to call when loading the component takes a callback
+//    props: Object of props to pass to the component
+//
+// INPUT
+// -------
+// options = {
+//  route: '/',
+//  layer: 'screens',
+//  component: function(callback) {
+//    callback(null, require('../components/foo.js')
+//  },
+//  props: {
+//    title: 'TODAY'
+// }
+//
+// OUTPUT
+// -------
+//
+// '/': {
+//   'screens': {
+//      component: function(callback) {
+//        callback(null, require('../components/bar.js')
+//      },
+//      props: {
+//        title: 'TODAY'
+//       }
+//   }
+// }
+//
+// A route can target multiple layers.
+// A layer can only have one component per route.
+// This data structure _enforces_ that.
 function addRoute(options) {
   testOptions(options)
   var route     = options.route || '/'
@@ -162,14 +157,13 @@ function resolveComponents(route, urlData, callback) {
     return function(callback) {
       load(function(err, component) {
         component = defendAgainstDefault(component)
-        var name = component.constructor.displayName || component.name
         if (err) {
           throw err
           return
         }
         callback(
           null, {
-            component,
+            component:component,
             props: Object.assign({}, props, layer)
           }
         )
@@ -231,20 +225,17 @@ function testComponentOption(component) {
 //path: String value of the url pathname
 //query: Object of the query string parameters
 //params: Object of paramaterized data from pattern match.
-/*
-EXAMPLE:
--------
-
-If route pattern is:
-/things/:id/1234
-
-and url is:
-/things/1/1234
-
-then params would be:
-{ id:1234 }
-
-*/
+// EXAMPLE:
+// -------
+//
+// If route pattern is:
+// /things/:id/1234
+//
+// and url is:
+// /things/1/1234
+//
+// then params would be:
+// { id:1234 }
 function getUrlData(path, data) {
 
   if (typeof window !== 'undefined' &&
@@ -308,21 +299,21 @@ function removeTrailingSlash(path) {
 }
 
 module.exports = {
-  addListener,
-  addRoute,
-  getComponents,
-  getUrlData,
-  navigate,
-  readListeners,
-  readRoute,
-  readRoutes,
-  removeTrailingSlash,
-  register,
-  reset,
-  resolveComponents,
-  testComponentOption,
-  testListener,
-  testOptions,
-  testRoutes,
-  testRoutesArray
+  addListener:addListener,
+  addRoute:addRoute,
+  getComponents:getComponents,
+  getUrlData:getUrlData,
+  navigate:navigate,
+  readListeners:readListeners,
+  readRoute:readRoute,
+  readRoutes:readRoutes,
+  removeTrailingSlash:removeTrailingSlash,
+  register:register,
+  reset:reset,
+  resolveComponents:resolveComponents,
+  testComponentOption:testComponentOption,
+  testListener:testListener,
+  testOptions:testOptions,
+  testRoutes:testRoutes,
+  testRoutesArray:testRoutesArray
 }
