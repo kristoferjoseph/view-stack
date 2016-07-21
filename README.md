@@ -1,2 +1,2 @@
 # View Stack ✨👁🍰✨
-View layer aware router
+View stack router
