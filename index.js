@@ -1,12 +1,20 @@
 var queryString = require('query-string')
 var Pattern     = require('url-pattern')
 var parallel    = require('async').parallel
+var ready       = require('document-ready')
 //Object to store keyed routes in
 var routes = {}
 //Array of stored patterns for url param matching
 var patterns = []
 //Array of functions to call when the url updates
 var listeners = []
+ready(
+  function(){
+    if (typeof window !== 'undefined') {
+      window.popstate = update
+    }
+  }
+)
 //Adds a listener for route changes
 function addListener(listener) {
   testListener(listener)
@@ -27,12 +35,23 @@ function readListeners() {
 //Navigates to a route
 function navigate(path, title, state) {
   //Change the url
-  if (window) {
+  if (typeof window !== 'undefined') {
     window.history.pushState(state, title, path)
   }
   //Notify listeners
-  listeners.forEach(function(listener) {
-    listener(path, title, state)
+  listeners.foreach(function(listener) {
+    listener(getComponents(path, state))
+  })
+}
+//Updates listeners on popstate
+function update(e) {
+  let path = ''
+  let state = e.state
+  if (typeof window !== 'undefined') {
+    path = window.location.pathname
+  }
+  listeners.foreach(function(listener) {
+    listener(getComponents(path, state))
   })
 }
 //Defends against es2015 default export
@@ -47,9 +66,11 @@ function defendAgainstDefault(component) {
 function register(routes) {
   testRoutes(routes)
   testRoutesArray(routes)
-  routes.forEach(function(route) {
-    addRoute(route)
-  })
+  routes.forEach(
+    function(route) {
+      addRoute(route)
+    }
+  )
 }
 //Tests for the existence of the routes array, throws if missing
 function testRoutes(routes) {
@@ -130,7 +151,7 @@ function addRoute(options) {
   //Test for a paramaterized route
   if (/:/.test(route)) {
     var pattern = new Pattern(route)
-      //Add the pattern and the route for easier lookup
+    //Add the pattern and the route for easier lookup
     patterns.push({
       pattern: pattern,
       route: storedRoute
@@ -152,8 +173,8 @@ function resolveComponents(route, urlData, callback) {
     var routeData = route[layer]
     var load = routeData.component
     var props = Object.assign({}, routeData.props, urlData)
-      //To keep the user method signature simple
-      //we wrap the callback to return the structure we actually want
+    //To keep the user method signature simple
+    //we wrap the callback to return the structure we actually want
     return function(callback) {
       load(function(err, component) {
         component = defendAgainstDefault(component)
@@ -315,5 +336,6 @@ module.exports = {
   testListener:testListener,
   testOptions:testOptions,
   testRoutes:testRoutes,
-  testRoutesArray:testRoutesArray
+  testRoutesArray:testRoutesArray,
+  update:update
 }

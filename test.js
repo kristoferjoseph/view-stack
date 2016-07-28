@@ -3,7 +3,6 @@ var viewStack           = require('./')
 var addListener         = viewStack.addListener
 var addRoute            = viewStack.addRoute
 var getComponents       = viewStack.getComponents
-var getPersistentLayers = viewStack.getPersistentLayers
 var getUrlData          = viewStack.getUrlData
 var navigate            = viewStack.navigate
 var readListeners       = viewStack.readListeners
@@ -18,19 +17,36 @@ var testListener        = viewStack.testListener
 var testOptions         = viewStack.testOptions
 var testRoutes          = viewStack.testRoutes
 var testRoutesArray     = viewStack.testRoutesArray
+var display
+
+if (typeof window !== 'undefined') {
+  display = document.getElementById('output')
+}
+
+function print(out) {
+  if (display) {
+    display.innerHTML += out
+  }
+}
 
 function fail(msg) {
-  console.error('  ✘ ' + msg)
+  var out = '  ✘ ' + msg
+  console.error(out)
+  print('<h4 class="test-fail">'+out+'</h4>')
 }
 
 function pass(msg) {
-  console.info('  ✔︎ ' + msg)
+  var out = '  ✔︎ ' + msg
+  console.info(out)
+  print('<h4 class="test-pass">'+out+'</h4>')
 }
 
 function test(label, func) {
   beforeEach()
   var f = false
-  console.info(label || '')
+  label = label || ''
+  console.info(label)
+  print('<h3 class="test-label">'+label+'</h3>')
   try {
     msg = func()
   }
@@ -46,12 +62,12 @@ function test(label, func) {
   afterEach()
 }
 
+
 function beforeEach() {
   reset()
 }
 
-function afterEach() {
-}
+function afterEach() {}
 
 module.exports = function() {
 
@@ -60,7 +76,7 @@ module.exports = function() {
   })
 
   test('should register multiple routes', function() {
-      var routes
+      var routes = []
 
       register([{
         route: '/',

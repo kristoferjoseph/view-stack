@@ -4,8 +4,10 @@
   "description": "View stack router",
   "main": "index.js",
   "scripts": {
-    "test": "node ./test.js",
-    "dist": "browserify ./index.js | uglifyjs --compress --mangle --screw-ie8 > view-stack.min.js"
+    "start":"node ./server.js",
+    "test": "open ./test.html && npm run test-build",
+    "test-build": "watchify ./test.js -o ./test.bundle.js",
+    "umd": "browserify ./index.js --standalone ViewStack | uglifyjs --compress --mangle --screw-ie8 > view-stack.umd.js"
   },
   "repository": {
     "type": "git",
@@ -24,12 +26,15 @@
   "homepage": "https://github.com/kristoferjoseph/view-stack#readme",
   "dependencies": {
     "async": "^2.0.0",
+    "document-ready": "^1.0.2",
     "query-string": "^4.2.2",
     "tiny-uuid": "^1.0.0",
     "url-pattern": "^1.0.1"
   },
   "devDependencies": {
     "browserify": "^13.0.1",
-    "uglify-js": "^2.7.0"
+    "express": "^4.14.0",
+    "uglify-js": "^2.7.0",
+    "watchify": "^3.7.0"
   }
 }
