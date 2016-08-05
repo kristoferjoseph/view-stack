@@ -1,7 +1,7 @@
 {
   "name": "view-stack",
   "version": "2.0.0",
-  "description": "View stack = router + view layers + component loader",
+  "description": "Router for stacking views.",
   "main": "index.js",
   "scripts": {
     "test": "npm run browser-tests",
@@ -9,7 +9,8 @@
     "build-tests": "browserify ./test.js -o ./public/test.bundle.js",
     "watch-tests": "watchify ./test.js -o ./public/test.bundle.js",
     "browser-tests": "npm start && npm run build-tests && open http://localhost:6661",
-    "start": "node server.js"
+    "start": "node server.js",
+    "umd": "browserify ./index.js --standalone viewStack | uglifyjs --compress --mangle --screw-ie8 > view-stack.umd.js"
   },
   "repository": {
     "type": "git",
@@ -37,7 +38,7 @@
     "ejs": "^2.5.1",
     "express": "^4.14.0",
     "browserify": "^13.1.0",
-    "uglify-js": "^2.7.0",
+    "uglify-js": "git+https://github.com/mishoo/UglifyJS2.git#harmony",
     "tape": "^4.6.0",
     "watchify": "^3.7.0",
     "yo-yoify": "^3.4.0"
