@@ -97,6 +97,7 @@ test('should render multiple layers', function(t) {
       </div>
     `)
   )
+  vs.navigate('/')
   root.innerHTML = ''
   t.end()
 })

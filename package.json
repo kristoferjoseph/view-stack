@@ -31,7 +31,7 @@
   },
   "homepage": "https://github.com/kristoferjoseph/view-stack#readme",
   "dependencies": {
-    "thataway": "^2.1.1",
+    "thataway": "^2.1.2",
     "yo-yo": "^1.2.2"
   },
   "devDependencies": {

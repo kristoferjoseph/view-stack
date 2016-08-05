@@ -7086,7 +7086,6 @@ module.exports = function thataway() {
     var matcher
     if (route && typeof route === 'string' &&
         data && data === Object(data)) {
-
       matcher = routerParams(route)
       if (matcher) {
         patterns.push({
@@ -7094,7 +7093,6 @@ module.exports = function thataway() {
           data: data
         })
       }
-
       routes[route] = data
     }
     else {
@@ -7104,7 +7102,7 @@ module.exports = function thataway() {
 
   function addListener(listener) {
     if (typeof listener !== 'function') {
-      throw Error('addListener requires a function to be passed')
+      throw Error('addListener requires a function argument')
     }
     return listeners.push(listener)
   }
@@ -7146,18 +7144,23 @@ module.exports = function thataway() {
 
   function getRouteData(path) {
     var params
-    var data   = routes[path] || {}
-    data.path  = path
-    data.query = queryString.parse(location.search)
-
+    var data = routes[path]
     patterns.forEach(function(pattern) {
       params = pattern.matcher(path)
       if (params) {
-        data = Object.assign(data, pattern.data)
+        data?
+          Object.assign(data, pattern.data):
+          data = pattern.data
         data.params = params
       }
     })
-
+    if (data) {
+      data.path  = path
+      data.query = queryString.parse(location.search)
+    }
+    else {
+      throw Error('Route not found')
+    }
     return data
   }
 
@@ -9191,6 +9194,7 @@ test('should render multiple layers', function(t) {
       </div>
     `)
   )
+  vs.navigate('/')
   root.innerHTML = ''
   t.end()
 })

@@ -19,8 +19,8 @@ route is an Object with the keys:
       - callback: function that returns the componen to render into the layer
 
 ```
-var viewStack = require('view-stack')
-viewStack([
+var createViewStack = require('view-stack')
+var viewStack = createViewStack([
   {
     path: '/',
     data: {
