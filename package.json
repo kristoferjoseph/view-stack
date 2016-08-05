@@ -1,22 +1,27 @@
 {
   "name": "view-stack",
-  "version": "1.0.0",
-  "description": "View stack router",
+  "version": "2.0.0",
+  "description": "View stack = router + view layers + component loader",
   "main": "index.js",
   "scripts": {
-    "start":"node ./server.js",
-    "test": "open ./test.html && npm run test-build",
-    "test-build": "watchify ./test.js -o ./test.bundle.js",
-    "umd": "browserify ./index.js --standalone ViewStack | uglifyjs --compress --mangle --screw-ie8 > view-stack.umd.js"
+    "test": "npm run browser-tests",
+    "build": "browserify ./index.js -o ./bundle.js",
+    "build-tests": "browserify ./test.js -o ./public/test.bundle.js",
+    "watch-tests": "watchify ./test.js -o ./public/test.bundle.js",
+    "browser-tests": "npm start && npm run build-tests && open http://localhost:6661",
+    "start": "node server.js"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/kristoferjoseph/view-stack.git"
   },
   "keywords": [
+    "router",
     "view",
     "stack",
-    "router"
+    "layer",
+    "component",
+    "loader"
   ],
   "author": "@dam",
   "license": "Apache-2.0",
@@ -25,16 +30,16 @@
   },
   "homepage": "https://github.com/kristoferjoseph/view-stack#readme",
   "dependencies": {
-    "async": "^2.0.0",
-    "document-ready": "^1.0.2",
-    "query-string": "^4.2.2",
-    "tiny-uuid": "^1.0.0",
-    "url-pattern": "^1.0.1"
+    "thataway": "^2.1.1",
+    "yo-yo": "^1.2.2"
   },
   "devDependencies": {
-    "browserify": "^13.0.1",
+    "ejs": "^2.5.1",
     "express": "^4.14.0",
+    "browserify": "^13.1.0",
     "uglify-js": "^2.7.0",
-    "watchify": "^3.7.0"
+    "tape": "^4.6.0",
+    "watchify": "^3.7.0",
+    "yo-yoify": "^3.4.0"
   }
 }

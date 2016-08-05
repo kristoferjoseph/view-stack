@@ -1,341 +1,61 @@
-var queryString = require('query-string')
-var Pattern     = require('url-pattern')
-var parallel    = require('async').parallel
-var ready       = require('document-ready')
-//Object to store keyed routes in
-var routes = {}
-//Array of stored patterns for url param matching
-var patterns = []
-//Array of functions to call when the url updates
-var listeners = []
-ready(
-  function(){
-    if (typeof window !== 'undefined') {
-      window.popstate = update
-    }
-  }
-)
-//Adds a listener for route changes
-function addListener(listener) {
-  testListener(listener)
-  listeners.push(listener)
-  return readListeners()
-}
-function testListener(listener) {
-  if (typeof listener !== 'function') {
-    throw new Error(
-      'Listener must be a function'
-    )
-  }
-}
-//Read only copy of listeners
-function readListeners() {
-  return listeners.slice()
-}
-//Navigates to a route
-function navigate(path, title, state) {
-  //Change the url
-  if (typeof window !== 'undefined') {
-    window.history.pushState(state, title, path)
-  }
-  //Notify listeners
-  listeners.foreach(function(listener) {
-    listener(getComponents(path, state))
-  })
-}
-//Updates listeners on popstate
-function update(e) {
-  let path = ''
-  let state = e.state
-  if (typeof window !== 'undefined') {
-    path = window.location.pathname
-  }
-  listeners.foreach(function(listener) {
-    listener(getComponents(path, state))
-  })
-}
-//Defends against es2015 default export
-function defendAgainstDefault(component) {
-  if (component.default) {
-    component = component.default
-  }
-  return component
-}
-//This function takes an Array of routes and
-// registers them.
-function register(routes) {
-  testRoutes(routes)
-  testRoutesArray(routes)
-  routes.forEach(
-    function(route) {
-      addRoute(route)
-    }
-  )
-}
-//Tests for the existence of the routes array, throws if missing
-function testRoutes(routes) {
-  if (!routes) {
-    throw new Error(
-      'Missing required routes Array argument'
-    )
-  }
-}
-//Tests that the routes argument is an array, throws if not
-function testRoutesArray(routes) {
-  if (!Array.isArray(routes)) {
-    throw new Error(
-      'The routes argument needs to be an Array'
-    )
-  }
-}
-// This function adds a unique route.
-// full routes have the unique signature of:
-// route:layer:component
-// A route can have many layers and
-//  layers can have many component,
-//  but a layer can only have one component per route
-//  Options: Object with the signature:
-//    route: String of url or paramaterized url
-//    layer: String of the name of the target layer
-//    component: Function to call when loading the component takes a callback
-//    props: Object of props to pass to the component
-//
-// INPUT
-// -------
-// options = {
-//  route: '/',
-//  layer: 'screens',
-//  component: function(callback) {
-//    callback(null, require('../components/foo.js')
-//  },
-//  props: {
-//    title: 'TODAY'
-// }
-//
-// OUTPUT
-// -------
-//
-// '/': {
-//   'screens': {
-//      component: function(callback) {
-//        callback(null, require('../components/bar.js')
-//      },
-//      props: {
-//        title: 'TODAY'
-//       }
-//   }
-// }
-//
-// A route can target multiple layers.
-// A layer can only have one component per route.
-// This data structure _enforces_ that.
-function addRoute(options) {
-  testOptions(options)
-  var route     = options.route || '/'
-  var layer     = options.layer || 'screens'
-  var component = options.component
-  var props     = options.props || {}
-  testComponentOption(component)
+var router = require('thataway')()
+var yo = require('yo-yo')
 
-  //Use an existing route, or store a new one
-  var storedRoute = routes[route] ?
-    routes[route] : routes[route] = {}
-
-  //Use an existing layer, or store a new one
-  var storedLayer = storedRoute[layer] ?
-    storedRoute[layer] : storedRoute[layer] = {}
-
-  storedLayer.component = component
-  storedLayer.props = props
-
-  //Test for a paramaterized route
-  if (/:/.test(route)) {
-    var pattern = new Pattern(route)
-    //Add the pattern and the route for easier lookup
-    patterns.push({
-      pattern: pattern,
-      route: storedRoute
+module.exports = function viewStack(routes, data) {
+  var view
+  var persistentLayers = {}
+  if (Array.isArray(routes)) {
+    routes.forEach(function(route){
+      router.addRoute(route.path, route.data)
     })
   }
+  else if (routes === Object(routes)) {
+    router.addRoute(routes.path, routes.data)
+  }
 
-  return Object.assign({}, routes)
-}
-//Gets a render ready array of component definitions
-function getComponents(path, callback) {
-  var urlData = getUrlData(path)
-  path = urlData.path
-  var route = readRoute(path)
-  return resolveComponents(route, urlData, callback)
-}
-// Resolves component definitions for render
-function resolveComponents(route, urlData, callback) {
-  var components = Object.keys(route).map(function(layer) {
-    var routeData = route[layer]
-    var load = routeData.component
-    var props = Object.assign({}, routeData.props, urlData)
-    //To keep the user method signature simple
-    //we wrap the callback to return the structure we actually want
-    return function(callback) {
-      load(function(err, component) {
-        component = defendAgainstDefault(component)
-        if (err) {
-          throw err
-          return
+  router.addListener(update)
+
+  function create(data) {
+    if(!data) { return }
+    var layer = data.layer
+    if (data.persist) {
+      persistentLayers[layer] = data.callback
+    }
+    return yo`
+      <div>
+        ${Object.keys(persistentLayers)
+          .map(function(p) {
+            return (
+              Layer({
+                layer:p,
+                callback:persistentLayers[p]
+              })
+            )
+          })
         }
-        callback(
-          null, {
-            component:component,
-            props: Object.assign({}, props, layer)
-          }
-        )
-      })
-    }
-  })
-  //Since multiple layers can have component updates
-  // for a given route we need to resolve them all in parallel
-  parallel(components, function(err, results) {
-    if (err) {
-      throw err
-      return
-    } else {
-      callback(results)
-      return results
-    }
-  })
-}
-//Returns a copy of a route
-function readRoute(path) {
-  var route = routes[path]
-    //If we don't find an exact match
-    //  then we look for a paramaterized route
-    //  EXAMPLE:
-    //  -------
-    //  /thing/:id would match /thing/4
-  if (!route) {
-    patterns.forEach(function(matcher) {
-      var params = matcher.pattern.match(path)
-      if (params) {
-        route = matcher.route
-      }
-    })
-  }
-  return Object.assign({}, route)
-}
-//Returns a copy of the routes object
-function readRoutes() {
-  return Object.assign({}, routes)
-}
-//Tests for options object and throws if missing
-function testOptions(options) {
-  if (!options || typeof options !== 'object') {
-    throw new Error(
-      'Missing required options Object'
-    )
-  }
-}
-//Tests for options component property used in require call
-//  and throws if missing
-function testComponentOption(component) {
-  if (!component || typeof component !== 'function') {
-    throw new Error(
-      'Missing component require function. function(callback) { callback(null, component) }'
-    )
-  }
-}
-//Gets a path object of:
-//path: String value of the url pathname
-//query: Object of the query string parameters
-//params: Object of paramaterized data from pattern match.
-// EXAMPLE:
-// -------
-//
-// If route pattern is:
-// /things/:id/1234
-//
-// and url is:
-// /things/1/1234
-//
-// then params would be:
-// { id:1234 }
-function getUrlData(path, data) {
-
-  if (typeof window !== 'undefined' &&
-      typeof window.location !== 'undefined') {
-
-    var pathname = window.location.pathname
-    if (pathname && !path) {
-      path = pathname
-    }
-
-    var search = window.location.search
-    if (search) {
-      data = search
-    }
-
+        ${!data.persist? Layer(data): null}
+      </div>
+    `
   }
 
-  //If we are dealing with the root path return
-  if (path === '/') {
-    return {
-      path:path,
-      query: {},
-      params: {}
-    }
+  function update(newState) {
+    return yo.update(view, create(newState))
   }
 
-  path = removeTrailingSlash(path)
-  var query = queryString.parse(data)
-  var params = {}
-
-  //Passes params based on the pattern stored when we call
-  //the register method
-  if (patterns.length) {
-    params = patterns.map(function(p) {
-      return p.pattern.match(path)
-    })[0] || {}
-  }
+  view = create(data)
 
   return {
-    path:path,
-    query:query,
-    params:params
+    view: view,
+    navigate: router.navigate,
+    addRoute: router.addRoute
   }
-}
-//Resets all stored values
-function reset() {
-  routes = {}
-  patterns = []
-  listeners = []
-}
-//Removes the trailing slash from a pathname
-function removeTrailingSlash(path) {
-  if (!path) {
-    return
-  }
-  var hasTrailingSlash = path.length > 1 && path.slice(-1) === '/'
-  if (hasTrailingSlash) {
-    path = path.substring(0, path.length - 1)
-  }
-  return path
 }
 
-module.exports = {
-  addListener:addListener,
-  addRoute:addRoute,
-  getComponents:getComponents,
-  getUrlData:getUrlData,
-  navigate:navigate,
-  readListeners:readListeners,
-  readRoute:readRoute,
-  readRoutes:readRoutes,
-  removeTrailingSlash:removeTrailingSlash,
-  register:register,
-  reset:reset,
-  resolveComponents:resolveComponents,
-  testComponentOption:testComponentOption,
-  testListener:testListener,
-  testOptions:testOptions,
-  testRoutes:testRoutes,
-  testRoutesArray:testRoutesArray,
-  update:update
+function Layer(data) {
+  var component = data.callback()
+  return yo`
+    <div class=${data.layer}>
+      ${component(data)}
+    </div>
+  `
 }
