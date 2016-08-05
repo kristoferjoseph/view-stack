@@ -17,9 +17,8 @@ module.exports = function viewStack(routes, data) {
 
   function create(data) {
     if(!data) { return }
-    var layer = data.layer
     if (data.persist) {
-      persistentLayers[layer] = data.callback
+      persistentLayers[data.layer] = data.callback
     }
     return yo`
       <div>
@@ -33,7 +32,7 @@ module.exports = function viewStack(routes, data) {
             )
           })
         }
-        ${!data.persist? Layer(data): null}
+        ${!persistentLayers[data.layer]? Layer(data): null}
       </div>
     `
   }
