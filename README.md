@@ -8,7 +8,7 @@ Router for stacking views.
 ## Usage
 view stack signature is:
 
-viewStack(routes,initialRoute)
+viewStack(routes)
 
 routes is an Array of route objects
 route is an Object with the keys:
@@ -16,7 +16,7 @@ route is an Object with the keys:
   - data: Object with the keys:
       - persist: Whether to persist layer between renders
       - layer: Name of layer (Modals, Sheets etc.)
-      - callback: function that returns the componen to render into the layer
+      - callback: function that returns the component to render into the layer
 
 ```
 var createViewStack = require('view-stack')
@@ -46,22 +46,13 @@ var viewStack = createViewStack([
         return require('./components/c')
       }
     }
-  }],{
-    path: '/',
-    data: {
-      persist: true,
-      layer: 'screens',
-      callback: function() {
-        return require('./components/a')
-      }
-    }
   }
-)
+])
 
-document.body.appendChild(viewStack.view)
+document.body.appendChild(viewStack)
 //Initial view will be component `A`
-viewStack.navigate('/b')
-//Navigating to `/b` will load `B` above`A` since `A` is persitent
+//data passed to components will have a navigate method appended.
+// data.navigate('/b') proceeds to next route.
 ```
 
 ## Test

@@ -45,25 +45,18 @@ test('should add single route', function(t) {
   t.end()
 })
 
-test.skip('should have navigate method',function(t){
+test.skip('should return view',function(t){
   var routes = require('./routes.js').slice()
-  var vs = viewStack(routes, routes[0].data)
-  t.ok(vs.navigate)
-  t.end()
-})
-
-test('should have addRoute method',function(t){
-  var routes = require('./routes.js').slice()
-  var vs = viewStack(routes, routes[0].data)
-  t.ok(vs.addRoute)
+  var vs = viewStack(routes)
+  t.ok(vs)
   t.end()
 })
 
 test('should create view', function(t) {
   var routes = require('./routes.js').slice()
-  var vs = viewStack(routes, routes[0].data)
+  var vs = viewStack(routes)
   var root = document.getElementById('root')
-  root.appendChild(vs.view)
+  root.appendChild(vs)
   t.equal(
     strip(document.getElementById('root').innerHTML),
     strip(`
@@ -80,10 +73,10 @@ test('should create view', function(t) {
 
 test('should render multiple layers', function(t) {
   var routes = require('./routes.js').slice()
-  var vs = viewStack(routes, routes[0].data)
+  location.href = '/c'
+  var vs = viewStack(routes)
   var root = document.getElementById('root')
-  root.appendChild(vs.view)
-  vs.navigate('/c')
+  root.appendChild(vs)
   t.equal(
     strip(document.getElementById('root').innerHTML),
     strip(`
@@ -97,7 +90,7 @@ test('should render multiple layers', function(t) {
       </div>
     `)
   )
-  vs.navigate('/')
+  location.href = '/'
   root.innerHTML = ''
   t.end()
 })
