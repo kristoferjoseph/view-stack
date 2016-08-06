@@ -24,7 +24,7 @@ module.exports = function viewStack(routes) {
       persistentLayers[data.layer] = data
     }
     return yo`
-      <div>
+      <div class='view-stack'>
         ${Object.keys(persistentLayers)
           .map(function(p) {
             return (

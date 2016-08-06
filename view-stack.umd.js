@@ -3,7 +3,7 @@
       ${t(e)}
     </div>
   `}var o=e("thataway")(),i=e("yo-yo");t.exports=function(e){function t(e){if(e)return e.persist&&(f[e.layer]=e),i`
-      <div>
+      <div class='view-stack'>
         ${Object.keys(f).map(function(e){return r(f[e])})}
         ${f[e.layer]?null:r(e)}
       </div>
