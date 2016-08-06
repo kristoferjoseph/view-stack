@@ -26,8 +26,10 @@ module.exports = function D() {
 var router = require('thataway')()
 var yo = require('yo-yo')
 
-module.exports = function viewStack(routes, data) {
+module.exports = function viewStack(routes, path) {
+  path = path || location.pathname || '/'
   var view
+  var data
   var persistentLayers = {}
   if (Array.isArray(routes)) {
     routes.forEach(function(route){
@@ -39,21 +41,20 @@ module.exports = function viewStack(routes, data) {
   }
 
   router.addListener(update)
+  data = router.getRouteData(path)
+  data.navigate = router.navigate
 
   function create(data) {
     if(!data) { return }
     if (data.persist) {
-      persistentLayers[data.layer] = data.callback
+      persistentLayers[data.layer] = data
     }
     return yo`
-      <div>
+      <div class='view-stack'>
         ${Object.keys(persistentLayers)
           .map(function(p) {
             return (
-              Layer({
-                layer:p,
-                callback:persistentLayers[p]
-              })
+              Layer(persistentLayers[p])
             )
           })
         }
@@ -63,16 +64,11 @@ module.exports = function viewStack(routes, data) {
   }
 
   function update(newState) {
+    newState.navigate = router.navigate
     return yo.update(view, create(newState))
   }
 
-  view = create(data)
-
-  return {
-    view: view,
-    navigate: router.navigate,
-    addRoute: router.addRoute
-  }
+  return view = create(data)
 }
 
 function Layer(data) {
@@ -2339,22 +2335,26 @@ if (typeof Object.create === 'function') {
 }
 
 },{}],14:[function(require,module,exports){
-/**
- * Determine if an object is Buffer
+/*!
+ * Determine if an object is a Buffer
  *
- * Author:   Feross Aboukhadijeh <feross@feross.org> <http://feross.org>
- * License:  MIT
- *
- * `npm install is-buffer`
+ * @author   Feross Aboukhadijeh <feross@feross.org> <http://feross.org>
+ * @license  MIT
  */
 
+// The _isBuffer check is for Safari 5-7 support, because it's missing
+// Object.prototype.constructor. Remove this eventually
 module.exports = function (obj) {
-  return !!(obj != null &&
-    (obj._isBuffer || // For Safari 5-7 (missing Object.prototype.constructor)
-      (obj.constructor &&
-      typeof obj.constructor.isBuffer === 'function' &&
-      obj.constructor.isBuffer(obj))
-    ))
+  return obj != null && (isBuffer(obj) || isSlowBuffer(obj) || !!obj._isBuffer)
+}
+
+function isBuffer (obj) {
+  return !!obj.constructor && typeof obj.constructor.isBuffer === 'function' && obj.constructor.isBuffer(obj)
+}
+
+// For Node v0.10 support. Remove this eventually.
+function isSlowBuffer (obj) {
+  return typeof obj.readFloatLE === 'function' && typeof obj.slice === 'function' && isBuffer(obj.slice(0, 0))
 }
 
 },{}],15:[function(require,module,exports){
@@ -9112,13 +9112,16 @@ test('should add routes as array', function(t) {
   var routes = require('./routes.js').slice()
   t.doesNotThrow(
     function(){
-      viewStack(
-        [{
-          path: '/a',
-          data: {}
-        }],
-        routes[0].data
-      )
+      viewStack([{
+          path: '/',
+          data: {
+            callback: function() {
+              return function(data) {
+                console.log('DATA:', data)
+              }
+            }
+          }
+        }])
     },
     Error
   )
@@ -9132,39 +9135,37 @@ test('should add single route', function(t) {
       viewStack(
         {
           path: '/a',
-          data: {}
+          data: {
+            callback: function() {
+              return function(data) {
+                console.log('DATA:', data)
+              }
+            }
+          }
         },
-        routes[0].data
-      )
+      '/a')
     },
     Error
   )
   t.end()
 })
 
-test.skip('should have navigate method',function(t){
+test.skip('should return view',function(t){
   var routes = require('./routes.js').slice()
-  var vs = viewStack(routes, routes[0].data)
-  t.ok(vs.navigate)
-  t.end()
-})
-
-test('should have addRoute method',function(t){
-  var routes = require('./routes.js').slice()
-  var vs = viewStack(routes, routes[0].data)
-  t.ok(vs.addRoute)
+  var vs = viewStack(routes)
+  t.ok(vs)
   t.end()
 })
 
 test('should create view', function(t) {
   var routes = require('./routes.js').slice()
-  var vs = viewStack(routes, routes[0].data)
+  var vs = viewStack(routes)
   var root = document.getElementById('root')
-  root.appendChild(vs.view)
+  root.appendChild(vs)
   t.equal(
     strip(document.getElementById('root').innerHTML),
     strip(`
-      <div>
+      <div class="view-stack">
         <div class="screens">
           <h1>A</h1>
         </div>
@@ -9175,16 +9176,34 @@ test('should create view', function(t) {
   t.end()
 })
 
-test('should render multiple layers', function(t) {
+test('should not blow up when no persistent layer present', function(t) {
   var routes = require('./routes.js').slice()
-  var vs = viewStack(routes, routes[0].data)
+  var vs = viewStack(routes[4], '/d')
   var root = document.getElementById('root')
-  root.appendChild(vs.view)
-  vs.navigate('/c')
+  root.appendChild(vs)
   t.equal(
     strip(document.getElementById('root').innerHTML),
     strip(`
-      <div>
+      <div class="view-stack">
+        <div class="modals">
+          <h1>D</h1>
+        </div>
+      </div>
+    `)
+  )
+  root.innerHTML = ''
+  t.end()
+})
+//This works, just REALLY hard to test because th viewStack is no longer exposing a global navigate method
+test.skip('should render multiple layers', function(t) {
+  var routes = require('./routes.js').slice()
+  var vs = viewStack(routes, '/a')
+  var root = document.getElementById('root')
+  root.appendChild(vs)
+  t.equal(
+    strip(document.getElementById('root').innerHTML),
+    strip(`
+      <div class="view-stack">
         <div class="screens">
           <h1>A</h1>
         </div>
@@ -9194,8 +9213,6 @@ test('should render multiple layers', function(t) {
       </div>
     `)
   )
-  vs.navigate('/')
-  root.innerHTML = ''
   t.end()
 })
 

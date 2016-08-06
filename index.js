@@ -1,7 +1,8 @@
 var router = require('thataway')()
 var yo = require('yo-yo')
 
-module.exports = function viewStack(routes) {
+module.exports = function viewStack(routes, path) {
+  path = path || location.pathname || '/'
   var view
   var data
   var persistentLayers = {}
@@ -15,7 +16,7 @@ module.exports = function viewStack(routes) {
   }
 
   router.addListener(update)
-  data = router.getRouteData(location.pathname)
+  data = router.getRouteData(path)
   data.navigate = router.navigate
 
   function create(data) {

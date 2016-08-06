@@ -10,7 +10,7 @@ https://github.com/kristoferjoseph/view-stack-example
 ## Usage
 view stack signature is:
 
-viewStack(routes)
+viewStack(routes, path)
 
 routes is an Array of route objects
 route is an Object with the keys:
@@ -19,6 +19,8 @@ route is an Object with the keys:
       - persist: Whether to persist layer between renders
       - layer: Name of layer (Modals, Sheets etc.)
       - callback: function that returns the component to render into the layer
+
+path is a url pathname fragment for use in server side render defaults to location.pathname or '/'
 
 ```
 var createViewStack = require('view-stack')
