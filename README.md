@@ -1,6 +1,8 @@
 # 🎊view stack🎉
 Router for stacking views.
-#🚧Work in progress use at your own risk!👷
+
+Check out the example here:
+https://github.com/kristoferjoseph/view-stack-example
 
 ## Install
 `npm i view-stack`
