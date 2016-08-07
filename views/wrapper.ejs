@@ -3,13 +3,52 @@
 <head>
   <meta charset="UTF-8">
   <title><%- title %></title>
+  <meta charset="UTF-8">
+  <meta http-equiv="content-type" charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="stylesheet" href="//kristoferjoseph.com/font/bold.css" media="all">
+  <link rel="stylesheet" href="//kristoferjoseph.com/font/regular.css" media="all">
+  <link rel="stylesheet" href="//kristoferjoseph.com/font/light-italic.css" media="all">
+  <style>
+    * {
+      box-sizing: border-box;
+      padding: 0;
+      margin: 0;
+    }
+
+    :focus {
+      border:none;
+      outline:none;
+    }
+
+    html,
+    body,
+    #root {
+      height: 100%;
+    }
+
+    body {
+      padding: 3rem;
+      font-family: 'Gibson', sans-serif;
+      font-weight: 500;
+      font-size: 3rem;
+      text-align: center;
+      color: #1b006d;
+      background-image: linear-gradient(90deg, #0025CC, #770AEB);
+      background: #0025CC;
+    }
+
+  </style>
 </head>
 <body>
-  <h1>Pop open dev tool console to see test output</h1>
+  <h1>⌘⌥I</h1>
   <div id="root"></div>
   <script>
-    window.__INITIAL_STATE__ = <%- initialState %>
-    console.log(__INITIAL_STATE__)
+    window.__SERVER_STATE__ = <%- serverState %>
+    console.log(__SERVER_STATE__)
   </script>
   <script src="test.bundle.js"></script>
 </body>

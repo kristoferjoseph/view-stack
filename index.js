@@ -5,7 +5,7 @@ module.exports = function viewStack(routes, path) {
   path = path || location.pathname || '/'
   var view
   var data
-  var persistentLayers = {}
+  var persist = {}
   if (Array.isArray(routes)) {
     routes.forEach(function(route){
       router.addRoute(route.path, route.data)
@@ -22,18 +22,18 @@ module.exports = function viewStack(routes, path) {
   function create(data) {
     if(!data) { return }
     if (data.persist) {
-      persistentLayers[data.layer] = data
+      persist[data.layer] = data
     }
     return yo`
       <div class='view-stack'>
-        ${Object.keys(persistentLayers)
+        ${Object.keys(persist)
           .map(function(p) {
             return (
-              Layer(persistentLayers[p])
+              Layer(persist[p])
             )
           })
         }
-        ${!persistentLayers[data.layer]? Layer(data): null}
+        ${!data.persist[data.layer]? Layer(data): null}
       </div>
     `
   }

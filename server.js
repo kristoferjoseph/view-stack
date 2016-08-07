@@ -6,7 +6,7 @@ app.use(express.static('public'))
 app.use(function(req, res, next) {
   res.blap = function(state) {
     state = state || {}
-    state.initialState = JSON.stringify(state)
+    state.serverState = JSON.stringify(state)
     res.render('wrapper', state)
   }
   next()
