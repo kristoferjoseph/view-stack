@@ -1,4 +1,4 @@
-# 🎊view stack🎉
+# ⚡️view stack⚡️
 Router for stacking views.
 
 Check out the example here:
