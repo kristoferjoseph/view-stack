@@ -25,15 +25,19 @@ module.exports = function D() {
 },{"yo-yo":72}],5:[function(require,module,exports){
 var router = require('thataway')()
 var yo = require('yo-yo')
+var location
 if (typeof window === 'undefined') {
   location = {
     pathname: '/'
   }
 }
+else {
+  location = window.location
+}
 
 module.exports = function viewStack(routes, path) {
-  path = path || location.pathname || '/'
-  var view
+  path = path || location.pathname
+  var element
   var data
   var persist = {}
   if (Array.isArray(routes)) {
@@ -68,7 +72,7 @@ module.exports = function viewStack(routes, path) {
 
   function update(newState) {
     newState.navigate = router.navigate
-    return yo.update(view, create(newState))
+    return yo.update(elem, create(newState))
   }
 
   function renderStatic(path) {
@@ -77,8 +81,10 @@ module.exports = function viewStack(routes, path) {
     ).outerHTML
   }
 
+  element = create(data)
+
   return {
-    element: create(data),
+    element: element,
     renderStatic: renderStatic
   }
 }
@@ -7083,8 +7089,18 @@ function through (write, end, opts) {
 
 }).call(this,require('_process'))
 },{"_process":16,"stream":32}],65:[function(require,module,exports){
-var queryString = require('query-string')
+var queryString  = require('query-string')
 var routerParams = require('router-params')
+var location
+if (typeof window === 'undefined') {
+  location = {
+    pathname: '/',
+    search: ''
+  }
+}
+else {
+  location = window.location
+}
 
 module.exports = function thataway() {
   var listeners = []

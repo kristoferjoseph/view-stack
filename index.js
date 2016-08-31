@@ -12,7 +12,7 @@ else {
 
 module.exports = function viewStack(routes, path) {
   path = path || location.pathname
-  var view
+  var element
   var data
   var persist = {}
   if (Array.isArray(routes)) {
@@ -47,7 +47,7 @@ module.exports = function viewStack(routes, path) {
 
   function update(newState) {
     newState.navigate = router.navigate
-    return yo.update(view, create(newState))
+    return yo.update(elem, create(newState))
   }
 
   function renderStatic(path) {
@@ -56,8 +56,10 @@ module.exports = function viewStack(routes, path) {
     ).outerHTML
   }
 
+  element = create(data)
+
   return {
-    element: create(data),
+    element: element,
     renderStatic: renderStatic
   }
 }
