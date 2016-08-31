@@ -4,7 +4,6 @@
     </div>
   `}var o,i=e("thataway")(),a=e("yo-yo");o="undefined"==typeof window?{pathname:"/"}:window.location,t.exports=function(e,t){function n(e){if(e)return c.sheets=null,c.modals=null,c[e.layer]=e,a`
       <div class='view-stack'>
-        ${c.menu?r(c.menu):null}
         ${c.screens?r(c.screens):null}
         ${c.sheets?r(c.sheets):null}
         ${c.modals?r(c.modals):null}

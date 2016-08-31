@@ -62,7 +62,6 @@ module.exports = function viewStack(routes, path) {
 
     return yo`
       <div class='view-stack'>
-        ${layers.menu? Layer(layers.menu): null}
         ${layers.screens? Layer(layers.screens): null}
         ${layers.sheets? Layer(layers.sheets): null}
         ${layers.modals? Layer(layers.modals): null}
@@ -72,7 +71,7 @@ module.exports = function viewStack(routes, path) {
 
   function update(newState) {
     newState.navigate = router.navigate
-    return yo.update(elem, create(newState))
+    return yo.update(element, create(newState))
   }
 
   function renderStatic(path) {

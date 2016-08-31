@@ -37,7 +37,6 @@ module.exports = function viewStack(routes, path) {
 
     return yo`
       <div class='view-stack'>
-        ${layers.menu? Layer(layers.menu): null}
         ${layers.screens? Layer(layers.screens): null}
         ${layers.sheets? Layer(layers.sheets): null}
         ${layers.modals? Layer(layers.modals): null}
