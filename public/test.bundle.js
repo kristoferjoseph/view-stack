@@ -25,6 +25,11 @@ module.exports = function D() {
 },{"yo-yo":72}],5:[function(require,module,exports){
 var router = require('thataway')()
 var yo = require('yo-yo')
+if (typeof window === 'undefined') {
+  location = {
+    pathname: '/'
+  }
+}
 
 module.exports = function viewStack(routes, path) {
   path = path || location.pathname || '/'
@@ -66,15 +71,15 @@ module.exports = function viewStack(routes, path) {
     return yo.update(view, create(newState))
   }
 
-  function renderPath(path) {
+  function renderStatic(path) {
     return create(
       router.getRouteData(path)
     ).outerHTML
   }
 
   return {
-    view: create(data),
-    renderPath: renderPath
+    element: create(data),
+    renderStatic: renderStatic
   }
 }
 
@@ -9118,9 +9123,8 @@ test('viewStack should exist', function(t) {
 test('should render to string from a path', function(t) {
   var routes = require('./routes.js').slice()
   var vs = viewStack(routes)
-  var string = vs.renderPath('/a')
   t.equal(
-    strip(vs.renderPath('/a')),
+    strip(vs.renderStatic('/a')),
     strip(`
       <div class="view-stack">
         <div class="screens">
@@ -9176,14 +9180,14 @@ test('should add single route', function(t) {
 
 test('should return view',function(t){
   var routes = require('./routes.js').slice()
-  var vs = viewStack(routes).view
+  var vs = viewStack(routes).element
   t.ok(vs)
   t.end()
 })
 
 test('should create view', function(t) {
   var routes = require('./routes.js').slice()
-  var vs = viewStack(routes).view
+  var vs = viewStack(routes).element
   var root = document.getElementById('root')
   root.appendChild(vs)
   t.equal(
@@ -9202,7 +9206,7 @@ test('should create view', function(t) {
 
 test('should not blow up when no persistent layer present', function(t) {
   var routes = require('./routes.js').slice()
-  var vs = viewStack(routes[4], '/d').view
+  var vs = viewStack(routes[4], '/d').element
   var root = document.getElementById('root')
   root.appendChild(vs)
   t.equal(
@@ -9222,9 +9226,9 @@ test('should not blow up when no persistent layer present', function(t) {
 test('should render multiple layers', function(t) {
   var routes = require('./routes.js').slice()
   var vs = viewStack(routes, '/a')
-  root.appendChild(vs.view)
+  root.appendChild(vs.element)
   t.equal(
-    strip(vs.renderPath('/c')),
+    strip(vs.renderStatic('/c')),
     strip(`
       <div class="view-stack">
         <div class="screens">

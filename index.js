@@ -1,5 +1,10 @@
 var router = require('thataway')()
 var yo = require('yo-yo')
+if (typeof window === 'undefined') {
+  location = {
+    pathname: '/'
+  }
+}
 
 module.exports = function viewStack(routes, path) {
   path = path || location.pathname || '/'
@@ -41,15 +46,15 @@ module.exports = function viewStack(routes, path) {
     return yo.update(view, create(newState))
   }
 
-  function renderPath(path) {
+  function renderStatic(path) {
     return create(
       router.getRouteData(path)
     ).outerHTML
   }
 
   return {
-    view: create(data),
-    renderPath: renderPath
+    element: create(data),
+    renderStatic: renderStatic
   }
 }
 
