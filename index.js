@@ -1,13 +1,17 @@
 var router = require('thataway')()
 var yo = require('yo-yo')
+var location
 if (typeof window === 'undefined') {
   location = {
     pathname: '/'
   }
 }
+else {
+  location = window.location
+}
 
 module.exports = function viewStack(routes, path) {
-  path = path || location.pathname || '/'
+  path = path || location.pathname
   var view
   var data
   var persist = {}
