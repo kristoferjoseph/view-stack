@@ -1,6 +1,6 @@
 {
   "name": "view-stack",
-  "version": "7.0.3",
+  "version": "7.0.4",
   "description": "Router for stacking views.",
   "main": "index.js",
   "scripts": {
