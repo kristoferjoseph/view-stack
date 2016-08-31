@@ -8,7 +8,7 @@
     "build": "browserify ./index.js -o ./bundle.js",
     "build-tests": "browserify ./test.js -o ./public/test.bundle.js",
     "watch-tests": "watchify ./test.js -o ./public/test.bundle.js",
-    "browser-tests": "npm start && npm run build-tests && open http://localhost:6661",
+    "browser-tests": "npm run build-tests && npm start && open http://localhost:6661",
     "start": "node server.js",
     "umd": "browserify ./index.js --standalone ViewStack | uglifyjs --compress --mangle --screw-ie8 > view-stack.umd.js"
   },

@@ -30,7 +30,7 @@ module.exports = function viewStack(routes, path) {
   path = path || location.pathname || '/'
   var view
   var data
-  var persistentLayers = {}
+  var persist = {}
   if (Array.isArray(routes)) {
     routes.forEach(function(route){
       router.addRoute(route.path, route.data)
@@ -44,21 +44,19 @@ module.exports = function viewStack(routes, path) {
   data = router.getRouteData(path)
   data.navigate = router.navigate
 
+  var layers = {}
   function create(data) {
     if(!data) { return }
-    if (data.persist) {
-      persistentLayers[data.layer] = data
-    }
+    layers['sheets'] = null
+    layers['modals'] = null
+    layers[data.layer] = data
+
     return yo`
       <div class='view-stack'>
-        ${Object.keys(persistentLayers)
-          .map(function(p) {
-            return (
-              Layer(persistentLayers[p])
-            )
-          })
-        }
-        ${!persistentLayers[data.layer]? Layer(data): null}
+        ${layers.menu? Layer(layers.menu): null}
+        ${layers.screens? Layer(layers.screens): null}
+        ${layers.sheets? Layer(layers.sheets): null}
+        ${layers.modals? Layer(layers.modals): null}
       </div>
     `
   }
@@ -68,7 +66,16 @@ module.exports = function viewStack(routes, path) {
     return yo.update(view, create(newState))
   }
 
-  return view = create(data)
+  function renderPath(path) {
+    return create(
+      router.getRouteData(path)
+    ).outerHTML
+  }
+
+  return {
+    view: create(data),
+    renderPath: renderPath
+  }
 }
 
 function Layer(data) {
@@ -9108,6 +9115,23 @@ test('viewStack should exist', function(t) {
   t.end()
 })
 
+test('should render to string from a path', function(t) {
+  var routes = require('./routes.js').slice()
+  var vs = viewStack(routes)
+  var string = vs.renderPath('/a')
+  t.equal(
+    strip(vs.renderPath('/a')),
+    strip(`
+      <div class="view-stack">
+        <div class="screens">
+          <h1>A</h1>
+        </div>
+      </div>
+    `),
+    'Renders to string from path')
+  t.end()
+})
+
 test('should add routes as array', function(t) {
   var routes = require('./routes.js').slice()
   t.doesNotThrow(
@@ -9150,16 +9174,16 @@ test('should add single route', function(t) {
   t.end()
 })
 
-test.skip('should return view',function(t){
+test('should return view',function(t){
   var routes = require('./routes.js').slice()
-  var vs = viewStack(routes)
+  var vs = viewStack(routes).view
   t.ok(vs)
   t.end()
 })
 
 test('should create view', function(t) {
   var routes = require('./routes.js').slice()
-  var vs = viewStack(routes)
+  var vs = viewStack(routes).view
   var root = document.getElementById('root')
   root.appendChild(vs)
   t.equal(
@@ -9178,7 +9202,7 @@ test('should create view', function(t) {
 
 test('should not blow up when no persistent layer present', function(t) {
   var routes = require('./routes.js').slice()
-  var vs = viewStack(routes[4], '/d')
+  var vs = viewStack(routes[4], '/d').view
   var root = document.getElementById('root')
   root.appendChild(vs)
   t.equal(
@@ -9195,13 +9219,12 @@ test('should not blow up when no persistent layer present', function(t) {
   t.end()
 })
 //This works, just REALLY hard to test because th viewStack is no longer exposing a global navigate method
-test.skip('should render multiple layers', function(t) {
+test('should render multiple layers', function(t) {
   var routes = require('./routes.js').slice()
   var vs = viewStack(routes, '/a')
-  var root = document.getElementById('root')
-  root.appendChild(vs)
+  root.appendChild(vs.view)
   t.equal(
-    strip(document.getElementById('root').innerHTML),
+    strip(vs.renderPath('/c')),
     strip(`
       <div class="view-stack">
         <div class="screens">

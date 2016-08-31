@@ -19,21 +19,19 @@ module.exports = function viewStack(routes, path) {
   data = router.getRouteData(path)
   data.navigate = router.navigate
 
+  var layers = {}
   function create(data) {
     if(!data) { return }
-    if (data.persist) {
-      persist[data.layer] = data
-    }
+    layers['sheets'] = null
+    layers['modals'] = null
+    layers[data.layer] = data
+
     return yo`
       <div class='view-stack'>
-        ${Object.keys(persist)
-          .map(function(p) {
-            return (
-              Layer(persist[p])
-            )
-          })
-        }
-        ${!data.persist[data.layer]? Layer(data): null}
+        ${layers.menu? Layer(layers.menu): null}
+        ${layers.screens? Layer(layers.screens): null}
+        ${layers.sheets? Layer(layers.sheets): null}
+        ${layers.modals? Layer(layers.modals): null}
       </div>
     `
   }
@@ -43,7 +41,16 @@ module.exports = function viewStack(routes, path) {
     return yo.update(view, create(newState))
   }
 
-  return view = create(data)
+  function renderPath(path) {
+    return create(
+      router.getRouteData(path)
+    ).outerHTML
+  }
+
+  return {
+    view: create(data),
+    renderPath: renderPath
+  }
 }
 
 function Layer(data) {

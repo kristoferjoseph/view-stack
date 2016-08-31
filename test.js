@@ -11,6 +11,23 @@ test('viewStack should exist', function(t) {
   t.end()
 })
 
+test('should render to string from a path', function(t) {
+  var routes = require('./routes.js').slice()
+  var vs = viewStack(routes)
+  var string = vs.renderPath('/a')
+  t.equal(
+    strip(vs.renderPath('/a')),
+    strip(`
+      <div class="view-stack">
+        <div class="screens">
+          <h1>A</h1>
+        </div>
+      </div>
+    `),
+    'Renders to string from path')
+  t.end()
+})
+
 test('should add routes as array', function(t) {
   var routes = require('./routes.js').slice()
   t.doesNotThrow(
@@ -53,16 +70,16 @@ test('should add single route', function(t) {
   t.end()
 })
 
-test.skip('should return view',function(t){
+test('should return view',function(t){
   var routes = require('./routes.js').slice()
-  var vs = viewStack(routes)
+  var vs = viewStack(routes).view
   t.ok(vs)
   t.end()
 })
 
 test('should create view', function(t) {
   var routes = require('./routes.js').slice()
-  var vs = viewStack(routes)
+  var vs = viewStack(routes).view
   var root = document.getElementById('root')
   root.appendChild(vs)
   t.equal(
@@ -81,7 +98,7 @@ test('should create view', function(t) {
 
 test('should not blow up when no persistent layer present', function(t) {
   var routes = require('./routes.js').slice()
-  var vs = viewStack(routes[4], '/d')
+  var vs = viewStack(routes[4], '/d').view
   var root = document.getElementById('root')
   root.appendChild(vs)
   t.equal(
@@ -98,13 +115,12 @@ test('should not blow up when no persistent layer present', function(t) {
   t.end()
 })
 //This works, just REALLY hard to test because th viewStack is no longer exposing a global navigate method
-test.skip('should render multiple layers', function(t) {
+test('should render multiple layers', function(t) {
   var routes = require('./routes.js').slice()
   var vs = viewStack(routes, '/a')
-  var root = document.getElementById('root')
-  root.appendChild(vs)
+  root.appendChild(vs.view)
   t.equal(
-    strip(document.getElementById('root').innerHTML),
+    strip(vs.renderPath('/c')),
     strip(`
       <div class="view-stack">
         <div class="screens">
