@@ -47,7 +47,7 @@ module.exports = function viewStack(routes, path) {
 
   function update(newState) {
     newState.navigate = router.navigate
-    return yo.update(elem, create(newState))
+    return yo.update(element, create(newState))
   }
 
   function renderStatic(path) {
