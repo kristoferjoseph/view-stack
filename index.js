@@ -30,7 +30,6 @@ module.exports = function viewStack(routes, store) {
 
   var layers = {}
   function create(data) {
-    console.log('DATA', data)
     if(!data) { return }
     layers['sheets'] = null
     layers['modals'] = null
