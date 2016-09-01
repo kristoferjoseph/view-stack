@@ -18,7 +18,7 @@ test('should render to string from a path', function(t) {
     strip(vs.renderStatic('/a')),
     strip(`
       <div class="view-stack">
-        <div class="screens">
+        <div class="view-stack-screens">
           <h1>A</h1>
         </div>
       </div>
@@ -85,7 +85,7 @@ test('should create view', function(t) {
     strip(document.getElementById('root').innerHTML),
     strip(`
       <div class="view-stack">
-        <div class="screens">
+        <div class="view-stack-screens">
           <h1>A</h1>
         </div>
       </div>
@@ -95,37 +95,36 @@ test('should create view', function(t) {
   t.end()
 })
 
-test('should not blow up when no persistent layer present', function(t) {
+test('should always render default screen', function(t) {
   var routes = require('./routes.js').slice()
-  var vs = viewStack(routes[4], '/d').element
-  var root = document.getElementById('root')
-  root.appendChild(vs)
+  var vs = viewStack(routes).renderStatic('/d')
   t.equal(
-    strip(document.getElementById('root').innerHTML),
+    strip(vs),
     strip(`
       <div class="view-stack">
-        <div class="modals">
+        <div class="view-stack-screens">
+          <h1>A</h1>
+        </div>
+        <div class="view-stack-modals">
           <h1>D</h1>
         </div>
       </div>
     `)
   )
-  root.innerHTML = ''
   t.end()
 })
-//This works, just REALLY hard to test because th viewStack is no longer exposing a global navigate method
+
 test('should render multiple layers', function(t) {
   var routes = require('./routes.js').slice()
-  var vs = viewStack(routes, '/a')
-  root.appendChild(vs.element)
+  var vs = viewStack(routes)
   t.equal(
     strip(vs.renderStatic('/c')),
     strip(`
       <div class="view-stack">
-        <div class="screens">
+        <div class="view-stack-screens">
           <h1>A</h1>
         </div>
-        <div class="sheets">
+        <div class="view-stack-sheets">
           <h1>C</h1>
         </div>
       </div>

@@ -10,11 +10,11 @@ else {
   location = window.location
 }
 
-module.exports = function viewStack(routes, path) {
-  path = path || location.pathname
+module.exports = function viewStack(routes, store) {
+  store = store || {}
+  path  = location.pathname
   var element
   var data
-  var persist = {}
   if (Array.isArray(routes)) {
     routes.forEach(function(route){
       router.addRoute(route.path, route.data)
@@ -30,6 +30,7 @@ module.exports = function viewStack(routes, path) {
 
   var layers = {}
   function create(data) {
+    console.log('DATA', data)
     if(!data) { return }
     layers['sheets'] = null
     layers['modals'] = null
@@ -37,9 +38,9 @@ module.exports = function viewStack(routes, path) {
 
     return yo`
       <div class='view-stack'>
-        ${layers.screens? Layer(layers.screens): null}
-        ${layers.sheets? Layer(layers.sheets): null}
-        ${layers.modals? Layer(layers.modals): null}
+        ${layers.screens? Layer(layers.screens, store): null}
+        ${layers.sheets? Layer(layers.sheets, store): null}
+        ${layers.modals? Layer(layers.modals, store): null}
       </div>
     `
   }
@@ -63,11 +64,17 @@ module.exports = function viewStack(routes, path) {
   }
 }
 
-function Layer(data) {
+function Layer(data, store) {
   var component = data.callback()
+  var layer = data.layer
+  var app = Object.assign({}, data)
+  delete app.callback
+  delete app.layer
+  store.app = app
+
   return yo`
-    <div class=${data.layer}>
-      ${component(data)}
+    <div class="view-stack-${layer}">
+      ${component(store)}
     </div>
   `
 }

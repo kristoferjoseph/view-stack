@@ -2,7 +2,6 @@ module.exports = [
   {
     path: '/',
     data: {
-      persist: true,
       layer: 'screens',
       callback: function() {
         return require('./components/a')
@@ -11,7 +10,6 @@ module.exports = [
   }, {
     path: '/a',
     data: {
-      persist: true,
       layer: 'screens',
       callback: function() {
         return require('./components/a')
