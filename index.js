@@ -16,7 +16,7 @@ module.exports = function viewStack(routes, store) {
   var element
   var data
   if (Array.isArray(routes)) {
-    routes.forEach(function(route){
+    routes.forEach(function(route) {
       router.addRoute(route.path, route.data)
     })
   }
@@ -34,7 +34,6 @@ module.exports = function viewStack(routes, store) {
     layers['sheets'] = null
     layers['modals'] = null
     layers[data.layer] = data
-
     return yo`
       <div class='view-stack'>
         ${layers.screens? Layer(layers.screens, store): null}
@@ -45,7 +44,6 @@ module.exports = function viewStack(routes, store) {
   }
 
   function update(newState) {
-    newState.navigate = router.navigate
     return yo.update(element, create(newState))
   }
 
@@ -54,9 +52,7 @@ module.exports = function viewStack(routes, store) {
       router.getRouteData(path)
     ).outerHTML
   }
-
   element = create(data)
-
   return {
     element: element,
     renderStatic: renderStatic
@@ -66,11 +62,9 @@ module.exports = function viewStack(routes, store) {
 function Layer(data, store) {
   var component = data.callback()
   var layer = data.layer
-  var app = Object.assign({}, data)
-  delete app.callback
-  delete app.layer
-  store.app = app
-
+  store = Object.assign(store, data)
+  delete store.callback
+  delete store.layer
   return yo`
     <div class="view-stack-${layer}">
       ${component(store)}
