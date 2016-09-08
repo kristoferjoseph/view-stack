@@ -11,6 +11,13 @@ test('viewStack should exist', function(t) {
   t.end()
 })
 
+test('should expose navigate method', function(t) {
+  var routes = require('./routes.js').slice()
+  var vs = viewStack(routes)
+  t.ok(vs.navigate)
+  t.end()
+})
+
 test('should render to string from a path', function(t) {
   var routes = require('./routes.js').slice()
   var vs = viewStack(routes)

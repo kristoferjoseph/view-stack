@@ -80,7 +80,8 @@ module.exports = function viewStack(routes, store) {
   element = create(data)
   return {
     element: element,
-    renderStatic: renderStatic
+    renderStatic: renderStatic,
+    navigate: router.navigate
   }
 }
 
@@ -9131,6 +9132,13 @@ function strip(str) {
 module.exports = function() {
 test('viewStack should exist', function(t) {
   t.ok(viewStack)
+  t.end()
+})
+
+test('should expose navigate method', function(t) {
+  var routes = require('./routes.js').slice()
+  var vs = viewStack(routes)
+  t.ok(vs.navigate)
   t.end()
 })
 
