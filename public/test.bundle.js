@@ -24,7 +24,7 @@ module.exports = function D() {
 
 },{"yo-yo":72}],5:[function(require,module,exports){
 var router = require('thataway')()
-var yo = require('yo-yo')
+var html = require('yo-yo')
 var location
 if (typeof window === 'undefined') {
   location = {
@@ -59,7 +59,7 @@ module.exports = function viewStack(routes, store) {
     layers['sheets'] = null
     layers['modals'] = null
     layers[data.layer] = data
-    return yo`
+    return html`
       <div class='view-stack'>
         ${layers.screens? Layer(layers.screens, store): null}
         ${layers.sheets? Layer(layers.sheets, store): null}
@@ -68,14 +68,14 @@ module.exports = function viewStack(routes, store) {
     `
   }
 
-  function update(newState) {
-    return yo.update(element, create(newState))
+  function update(newData) {
+    if (newData) {
+      return html.update(element, create(newData))
+    }
   }
 
   function renderStatic(path) {
-    return create(
-      router.getRouteData(path)
-    ).outerHTML
+    return create(router.getRouteData(path))
   }
   element = create(data)
   return {
@@ -91,7 +91,7 @@ function Layer(data, store) {
   store = Object.assign(store, data)
   delete store.callback
   delete store.layer
-  return yo`
+  return html`
     <div class="view-stack-${layer}">
       ${component(store)}
     </div>
@@ -9123,6 +9123,7 @@ module.exports = [
 
 },{"./components/a":1,"./components/b":2,"./components/c":3,"./components/d":4}],82:[function(require,module,exports){
 var test = require('tape')
+var html = require('yo-yo')
 var viewStack = require('./')
 
 function strip(str) {
@@ -9145,8 +9146,9 @@ test('should expose navigate method', function(t) {
 test('should render to string from a path', function(t) {
   var routes = require('./routes.js').slice()
   var vs = viewStack(routes)
+  var el = vs.renderStatic('/a')
   t.equal(
-    strip(vs.renderStatic('/a')),
+    strip(el.outerHTML),
     strip(`
       <div class="view-stack">
         <div class="view-stack-screens">
@@ -9230,7 +9232,7 @@ test('should always render default screen', function(t) {
   var routes = require('./routes.js').slice()
   var vs = viewStack(routes).renderStatic('/d')
   t.equal(
-    strip(vs),
+    strip(vs.outerHTML),
     strip(`
       <div class="view-stack">
         <div class="view-stack-screens">
@@ -9249,7 +9251,7 @@ test('should render multiple layers', function(t) {
   var routes = require('./routes.js').slice()
   var vs = viewStack(routes)
   t.equal(
-    strip(vs.renderStatic('/c')),
+    strip(vs.renderStatic('/c').outerHTML),
     strip(`
       <div class="view-stack">
         <div class="view-stack-screens">
@@ -9266,4 +9268,4 @@ test('should render multiple layers', function(t) {
 
 }()
 
-},{"./":5,"./routes.js":81,"tape":34}]},{},[82]);
+},{"./":5,"./routes.js":81,"tape":34,"yo-yo":72}]},{},[82]);

@@ -1,5 +1,5 @@
 var router = require('thataway')()
-var yo = require('yo-yo')
+var html = require('yo-yo')
 var location
 if (typeof window === 'undefined') {
   location = {
@@ -34,7 +34,7 @@ module.exports = function viewStack(routes, store) {
     layers['sheets'] = null
     layers['modals'] = null
     layers[data.layer] = data
-    return yo`
+    return html`
       <div class='view-stack'>
         ${layers.screens? Layer(layers.screens, store): null}
         ${layers.sheets? Layer(layers.sheets, store): null}
@@ -43,14 +43,14 @@ module.exports = function viewStack(routes, store) {
     `
   }
 
-  function update(newState) {
-    return yo.update(element, create(newState))
+  function update(newData) {
+    if (newData) {
+      return html.update(element, create(newData))
+    }
   }
 
   function renderStatic(path) {
-    return create(
-      router.getRouteData(path)
-    ).outerHTML
+    return create(router.getRouteData(path))
   }
   element = create(data)
   return {
@@ -66,7 +66,7 @@ function Layer(data, store) {
   store = Object.assign(store, data)
   delete store.callback
   delete store.layer
-  return yo`
+  return html`
     <div class="view-stack-${layer}">
       ${component(store)}
     </div>

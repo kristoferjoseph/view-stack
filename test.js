@@ -1,4 +1,5 @@
 var test = require('tape')
+var html = require('yo-yo')
 var viewStack = require('./')
 
 function strip(str) {
@@ -21,8 +22,9 @@ test('should expose navigate method', function(t) {
 test('should render to string from a path', function(t) {
   var routes = require('./routes.js').slice()
   var vs = viewStack(routes)
+  var el = vs.renderStatic('/a')
   t.equal(
-    strip(vs.renderStatic('/a')),
+    strip(el.outerHTML),
     strip(`
       <div class="view-stack">
         <div class="view-stack-screens">
@@ -106,7 +108,7 @@ test('should always render default screen', function(t) {
   var routes = require('./routes.js').slice()
   var vs = viewStack(routes).renderStatic('/d')
   t.equal(
-    strip(vs),
+    strip(vs.outerHTML),
     strip(`
       <div class="view-stack">
         <div class="view-stack-screens">
@@ -125,7 +127,7 @@ test('should render multiple layers', function(t) {
   var routes = require('./routes.js').slice()
   var vs = viewStack(routes)
   t.equal(
-    strip(vs.renderStatic('/c')),
+    strip(vs.renderStatic('/c').outerHTML),
     strip(`
       <div class="view-stack">
         <div class="view-stack-screens">
