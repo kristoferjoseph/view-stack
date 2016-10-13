@@ -82,8 +82,10 @@ module.exports = function viewStack(routes, store, path) {
     return create(data)
   }
 
+  element = create(data)
+
   return {
-    element: create(data),
+    element: element,
     navigate: router.navigate,
     render: render
   }
