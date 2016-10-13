@@ -22,7 +22,7 @@ test('should expose navigate method', function(t) {
 test('should render to string from a path', function(t) {
   var routes = require('./routes.js').slice()
   var vs = viewStack(routes)
-  var el = vs.renderStatic('/a')
+  var el = vs.render('/a')
   t.equal(
     strip(el.outerHTML),
     strip(`
@@ -106,7 +106,7 @@ test('should create view', function(t) {
 
 test('should always render default screen', function(t) {
   var routes = require('./routes.js').slice()
-  var vs = viewStack(routes).renderStatic('/d')
+  var vs = viewStack(routes).render('/d')
   t.equal(
     strip(vs.outerHTML),
     strip(`
@@ -127,7 +127,7 @@ test('should render multiple layers', function(t) {
   var routes = require('./routes.js').slice()
   var vs = viewStack(routes)
   t.equal(
-    strip(vs.renderStatic('/c').outerHTML),
+    strip(vs.render('/c').outerHTML),
     strip(`
       <div class="view-stack">
         <div class="view-stack-screens">

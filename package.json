@@ -32,6 +32,7 @@
   "homepage": "https://github.com/kristoferjoseph/view-stack#readme",
   "dependencies": {
     "thataway": "^2.1.4",
+    "xtend": "^4.0.1",
     "yo-yo": "^1.2.2"
   },
   "devDependencies": {

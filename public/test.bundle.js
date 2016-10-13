@@ -4,27 +4,28 @@ module.exports = function A() {
   return yo`<h1>A</h1>`
 }
 
-},{"yo-yo":72}],2:[function(require,module,exports){
+},{"yo-yo":73}],2:[function(require,module,exports){
 var yo = require('yo-yo')
 module.exports = function B() {
   return yo`<h1>B</h1>`
 }
 
-},{"yo-yo":72}],3:[function(require,module,exports){
+},{"yo-yo":73}],3:[function(require,module,exports){
 var yo = require('yo-yo')
 module.exports = function C() {
   return yo`<h1>C</h1>`
 }
 
-},{"yo-yo":72}],4:[function(require,module,exports){
+},{"yo-yo":73}],4:[function(require,module,exports){
 var yo = require('yo-yo')
 module.exports = function D() {
   return yo`<h1>D</h1>`
 }
 
-},{"yo-yo":72}],5:[function(require,module,exports){
+},{"yo-yo":73}],5:[function(require,module,exports){
 var router = require('thataway')()
 var html = require('yo-yo')
+var assign = require('xtend')
 var location
 if (typeof window === 'undefined') {
   location = {
@@ -35,9 +36,9 @@ else {
   location = window.location
 }
 
-module.exports = function viewStack(routes, store) {
+module.exports = function viewStack(routes, store, path) {
   store = store || {}
-  path  = location.pathname
+  path  = path || location.pathname
   var element
   var data
   if (Array.isArray(routes)) {
@@ -69,26 +70,26 @@ module.exports = function viewStack(routes, store) {
   }
 
   function update(newData) {
-    if (newData) {
-      return html.update(element, create(newData))
+    if (data !== newData) {
+      html.update(element, create(newData))
     }
   }
 
-  function renderStatic(path) {
+  function render(path) {
     return create(router.getRouteData(path))
   }
-  element = create(data)
+
   return {
-    element: element,
-    renderStatic: renderStatic,
-    navigate: router.navigate
+    element: create(data),
+    navigate: router.navigate,
+    render: render
   }
 }
 
 function Layer(data, store) {
   var component = data.callback()
   var layer = data.layer
-  store = Object.assign(store, data)
+  store = assign(store, data)
   delete store.callback
   delete store.layer
   return html`
@@ -98,7 +99,7 @@ function Layer(data, store) {
   `
 }
 
-},{"thataway":65,"yo-yo":72}],6:[function(require,module,exports){
+},{"thataway":65,"xtend":72,"yo-yo":73}],6:[function(require,module,exports){
 
 },{}],7:[function(require,module,exports){
 arguments[4][6][0].apply(exports,arguments)
@@ -7871,6 +7872,27 @@ module.exports = Array.isArray || function (arr) {
 };
 
 },{}],72:[function(require,module,exports){
+module.exports = extend
+
+var hasOwnProperty = Object.prototype.hasOwnProperty;
+
+function extend() {
+    var target = {}
+
+    for (var i = 0; i < arguments.length; i++) {
+        var source = arguments[i]
+
+        for (var key in source) {
+            if (hasOwnProperty.call(source, key)) {
+                target[key] = source[key]
+            }
+        }
+    }
+
+    return target
+}
+
+},{}],73:[function(require,module,exports){
 var bel = require('bel') // turns template tag into DOM elements
 var morphdom = require('morphdom') // efficiently diffs + morphs two DOM elements
 var defaultEvents = require('./update-events.js') // default events to be copied when dom elements update
@@ -7906,7 +7928,7 @@ module.exports.update = function (fromNode, toNode, opts) {
   }
 }
 
-},{"./update-events.js":80,"bel":73,"morphdom":79}],73:[function(require,module,exports){
+},{"./update-events.js":81,"bel":74,"morphdom":80}],74:[function(require,module,exports){
 var document = require('global/document')
 var hyperx = require('hyperx')
 var onload = require('on-load')
@@ -8048,7 +8070,7 @@ function belCreateElement (tag, props, children) {
 module.exports = hyperx(belCreateElement)
 module.exports.createElement = belCreateElement
 
-},{"global/document":74,"hyperx":76,"on-load":78}],74:[function(require,module,exports){
+},{"global/document":75,"hyperx":77,"on-load":79}],75:[function(require,module,exports){
 (function (global){
 var topLevel = typeof global !== 'undefined' ? global :
     typeof window !== 'undefined' ? window : {}
@@ -8067,7 +8089,7 @@ if (typeof document !== 'undefined') {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"min-document":7}],75:[function(require,module,exports){
+},{"min-document":7}],76:[function(require,module,exports){
 (function (global){
 if (typeof window !== "undefined") {
     module.exports = window;
@@ -8080,7 +8102,7 @@ if (typeof window !== "undefined") {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],76:[function(require,module,exports){
+},{}],77:[function(require,module,exports){
 var attrToProp = require('hyperscript-attribute-to-property')
 
 var VAR = 0, TEXT = 1, OPEN = 2, CLOSE = 3, ATTR = 4
@@ -8345,7 +8367,7 @@ var closeRE = RegExp('^(' + [
 ].join('|') + ')(?:[\.#][a-zA-Z0-9\u007F-\uFFFF_:-]+)*$')
 function selfClosing (tag) { return closeRE.test(tag) }
 
-},{"hyperscript-attribute-to-property":77}],77:[function(require,module,exports){
+},{"hyperscript-attribute-to-property":78}],78:[function(require,module,exports){
 module.exports = attributeToProperty
 
 var transform = {
@@ -8366,7 +8388,7 @@ function attributeToProperty (h) {
   }
 }
 
-},{}],78:[function(require,module,exports){
+},{}],79:[function(require,module,exports){
 /* global MutationObserver */
 var document = require('global/document')
 var window = require('global/window')
@@ -8455,7 +8477,7 @@ function eachMutation (nodes, fn) {
   }
 }
 
-},{"global/document":74,"global/window":75}],79:[function(require,module,exports){
+},{"global/document":75,"global/window":76}],80:[function(require,module,exports){
 // Create a range object for efficently rendering strings to elements.
 var range;
 
@@ -9038,7 +9060,7 @@ function morphdom(fromNode, toNode, options) {
 
 module.exports = morphdom;
 
-},{}],80:[function(require,module,exports){
+},{}],81:[function(require,module,exports){
 module.exports = [
   // attribute events (can be set with attributes)
   'onclick',
@@ -9076,7 +9098,7 @@ module.exports = [
   'onfocusout'
 ]
 
-},{}],81:[function(require,module,exports){
+},{}],82:[function(require,module,exports){
 module.exports = [
   {
     path: '/',
@@ -9121,7 +9143,7 @@ module.exports = [
   }
 ]
 
-},{"./components/a":1,"./components/b":2,"./components/c":3,"./components/d":4}],82:[function(require,module,exports){
+},{"./components/a":1,"./components/b":2,"./components/c":3,"./components/d":4}],83:[function(require,module,exports){
 var test = require('tape')
 var html = require('yo-yo')
 var viewStack = require('./')
@@ -9146,7 +9168,7 @@ test('should expose navigate method', function(t) {
 test('should render to string from a path', function(t) {
   var routes = require('./routes.js').slice()
   var vs = viewStack(routes)
-  var el = vs.renderStatic('/a')
+  var el = vs.render('/a')
   t.equal(
     strip(el.outerHTML),
     strip(`
@@ -9230,7 +9252,7 @@ test('should create view', function(t) {
 
 test('should always render default screen', function(t) {
   var routes = require('./routes.js').slice()
-  var vs = viewStack(routes).renderStatic('/d')
+  var vs = viewStack(routes).render('/d')
   t.equal(
     strip(vs.outerHTML),
     strip(`
@@ -9251,7 +9273,7 @@ test('should render multiple layers', function(t) {
   var routes = require('./routes.js').slice()
   var vs = viewStack(routes)
   t.equal(
-    strip(vs.renderStatic('/c').outerHTML),
+    strip(vs.render('/c').outerHTML),
     strip(`
       <div class="view-stack">
         <div class="view-stack-screens">
@@ -9268,4 +9290,4 @@ test('should render multiple layers', function(t) {
 
 }()
 
-},{"./":5,"./routes.js":81,"tape":34,"yo-yo":72}]},{},[82]);
+},{"./":5,"./routes.js":82,"tape":34,"yo-yo":73}]},{},[83]);
