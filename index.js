@@ -1,6 +1,7 @@
 var router = require('thataway')()
 var html = require('yo-yo')
-var assign = require('xtend')
+var assign = require('object-assign')
+
 var location
 if (typeof window === 'undefined') {
   location = {
@@ -45,13 +46,15 @@ module.exports = function viewStack(routes, store, path) {
   }
 
   function update(newData) {
-    if (data !== newData) {
+    if (newData) {
       html.update(element, create(newData))
     }
   }
 
   function render(path) {
-    return create(router.getRouteData(path))
+    var data = router.getRouteData(path)
+    data.navigate = router.navigate
+    return create(data)
   }
 
   return {

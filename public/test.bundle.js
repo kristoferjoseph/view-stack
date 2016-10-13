@@ -25,7 +25,8 @@ module.exports = function D() {
 },{"yo-yo":73}],5:[function(require,module,exports){
 var router = require('thataway')()
 var html = require('yo-yo')
-var assign = require('xtend')
+var assign = require('object-assign')
+
 var location
 if (typeof window === 'undefined') {
   location = {
@@ -70,13 +71,15 @@ module.exports = function viewStack(routes, store, path) {
   }
 
   function update(newData) {
-    if (data !== newData) {
+    if (newData) {
       html.update(element, create(newData))
     }
   }
 
   function render(path) {
-    return create(router.getRouteData(path))
+    var data = router.getRouteData(path)
+    data.navigate = router.navigate
+    return create(data)
   }
 
   return {
@@ -99,7 +102,7 @@ function Layer(data, store) {
   `
 }
 
-},{"thataway":65,"xtend":72,"yo-yo":73}],6:[function(require,module,exports){
+},{"object-assign":34,"thataway":66,"yo-yo":73}],6:[function(require,module,exports){
 
 },{}],7:[function(require,module,exports){
 arguments[4][6][0].apply(exports,arguments)
@@ -5175,6 +5178,91 @@ function base64DetectIncompleteChar(buffer) {
 }
 
 },{"buffer":8}],34:[function(require,module,exports){
+'use strict';
+/* eslint-disable no-unused-vars */
+var hasOwnProperty = Object.prototype.hasOwnProperty;
+var propIsEnumerable = Object.prototype.propertyIsEnumerable;
+
+function toObject(val) {
+	if (val === null || val === undefined) {
+		throw new TypeError('Object.assign cannot be called with null or undefined');
+	}
+
+	return Object(val);
+}
+
+function shouldUseNative() {
+	try {
+		if (!Object.assign) {
+			return false;
+		}
+
+		// Detect buggy property enumeration order in older V8 versions.
+
+		// https://bugs.chromium.org/p/v8/issues/detail?id=4118
+		var test1 = new String('abc');  // eslint-disable-line
+		test1[5] = 'de';
+		if (Object.getOwnPropertyNames(test1)[0] === '5') {
+			return false;
+		}
+
+		// https://bugs.chromium.org/p/v8/issues/detail?id=3056
+		var test2 = {};
+		for (var i = 0; i < 10; i++) {
+			test2['_' + String.fromCharCode(i)] = i;
+		}
+		var order2 = Object.getOwnPropertyNames(test2).map(function (n) {
+			return test2[n];
+		});
+		if (order2.join('') !== '0123456789') {
+			return false;
+		}
+
+		// https://bugs.chromium.org/p/v8/issues/detail?id=3056
+		var test3 = {};
+		'abcdefghijklmnopqrst'.split('').forEach(function (letter) {
+			test3[letter] = letter;
+		});
+		if (Object.keys(Object.assign({}, test3)).join('') !==
+				'abcdefghijklmnopqrst') {
+			return false;
+		}
+
+		return true;
+	} catch (e) {
+		// We don't expect any of the above to throw, but better to be safe.
+		return false;
+	}
+}
+
+module.exports = shouldUseNative() ? Object.assign : function (target, source) {
+	var from;
+	var to = toObject(target);
+	var symbols;
+
+	for (var s = 1; s < arguments.length; s++) {
+		from = Object(arguments[s]);
+
+		for (var key in from) {
+			if (hasOwnProperty.call(from, key)) {
+				to[key] = from[key];
+			}
+		}
+
+		if (Object.getOwnPropertySymbols) {
+			symbols = Object.getOwnPropertySymbols(from);
+			for (var i = 0; i < symbols.length; i++) {
+				if (propIsEnumerable.call(from, symbols[i])) {
+					to[symbols[i]] = from[symbols[i]];
+				}
+			}
+		}
+	}
+
+	return to;
+};
+
+},{}],35:[function(require,module,exports){
 (function (process){
 var defined = require('defined');
 var createDefaultStream = require('./lib/default_stream');
@@ -5328,7 +5416,7 @@ function createHarness (conf_) {
 }
 
 }).call(this,require('_process'))
-},{"./lib/default_stream":35,"./lib/results":36,"./lib/test":37,"_process":16,"defined":41,"through":64}],35:[function(require,module,exports){
+},{"./lib/default_stream":36,"./lib/results":37,"./lib/test":38,"_process":16,"defined":42,"through":65}],36:[function(require,module,exports){
 (function (process){
 var through = require('through');
 var fs = require('fs');
@@ -5363,7 +5451,7 @@ module.exports = function () {
 };
 
 }).call(this,require('_process'))
-},{"_process":16,"fs":6,"through":64}],36:[function(require,module,exports){
+},{"_process":16,"fs":6,"through":65}],37:[function(require,module,exports){
 (function (process){
 var EventEmitter = require('events').EventEmitter;
 var inherits = require('inherits');
@@ -5554,7 +5642,7 @@ function invalidYaml (str) {
 }
 
 }).call(this,require('_process'))
-},{"_process":16,"events":12,"function-bind":43,"has":44,"inherits":45,"object-inspect":46,"resumer":47,"through":64}],37:[function(require,module,exports){
+},{"_process":16,"events":12,"function-bind":44,"has":45,"inherits":46,"object-inspect":47,"resumer":48,"through":65}],38:[function(require,module,exports){
 (function (process,__dirname){
 var deepEqual = require('deep-equal');
 var defined = require('defined');
@@ -6061,7 +6149,7 @@ Test.skip = function (name_, _opts, _cb) {
 
 
 }).call(this,require('_process'),"/node_modules/tape/lib")
-},{"_process":16,"deep-equal":38,"defined":41,"events":12,"has":44,"inherits":45,"path":15,"string.prototype.trim":49}],38:[function(require,module,exports){
+},{"_process":16,"deep-equal":39,"defined":42,"events":12,"has":45,"inherits":46,"path":15,"string.prototype.trim":50}],39:[function(require,module,exports){
 var pSlice = Array.prototype.slice;
 var objectKeys = require('./lib/keys.js');
 var isArguments = require('./lib/is_arguments.js');
@@ -6157,7 +6245,7 @@ function objEquiv(a, b, opts) {
   return typeof a === typeof b;
 }
 
-},{"./lib/is_arguments.js":39,"./lib/keys.js":40}],39:[function(require,module,exports){
+},{"./lib/is_arguments.js":40,"./lib/keys.js":41}],40:[function(require,module,exports){
 var supportsArgumentsClass = (function(){
   return Object.prototype.toString.call(arguments)
 })() == '[object Arguments]';
@@ -6179,7 +6267,7 @@ function unsupported(object){
     false;
 };
 
-},{}],40:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 exports = module.exports = typeof Object.keys === 'function'
   ? Object.keys : shim;
 
@@ -6190,14 +6278,14 @@ function shim (obj) {
   return keys;
 }
 
-},{}],41:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 module.exports = function () {
     for (var i = 0; i < arguments.length; i++) {
         if (arguments[i] !== undefined) return arguments[i];
     }
 };
 
-},{}],42:[function(require,module,exports){
+},{}],43:[function(require,module,exports){
 var ERROR_MESSAGE = 'Function.prototype.bind called on incompatible ';
 var slice = Array.prototype.slice;
 var toStr = Object.prototype.toString;
@@ -6247,19 +6335,19 @@ module.exports = function bind(that) {
     return bound;
 };
 
-},{}],43:[function(require,module,exports){
+},{}],44:[function(require,module,exports){
 var implementation = require('./implementation');
 
 module.exports = Function.prototype.bind || implementation;
 
-},{"./implementation":42}],44:[function(require,module,exports){
+},{"./implementation":43}],45:[function(require,module,exports){
 var bind = require('function-bind');
 
 module.exports = bind.call(Function.call, Object.prototype.hasOwnProperty);
 
-},{"function-bind":43}],45:[function(require,module,exports){
+},{"function-bind":44}],46:[function(require,module,exports){
 arguments[4][13][0].apply(exports,arguments)
-},{"dup":13}],46:[function(require,module,exports){
+},{"dup":13}],47:[function(require,module,exports){
 var hasMap = typeof Map === 'function' && Map.prototype;
 var mapSizeDescriptor = Object.getOwnPropertyDescriptor && hasMap ? Object.getOwnPropertyDescriptor(Map.prototype, 'size') : null;
 var mapSize = hasMap && mapSizeDescriptor && typeof mapSizeDescriptor.get === 'function' ? mapSizeDescriptor.get : null;
@@ -6468,7 +6556,7 @@ function inspectString (str) {
     }
 }
 
-},{}],47:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 (function (process){
 var through = require('through');
 var nextTick = typeof setImmediate !== 'undefined'
@@ -6501,7 +6589,7 @@ module.exports = function (write, end) {
 };
 
 }).call(this,require('_process'))
-},{"_process":16,"through":64}],48:[function(require,module,exports){
+},{"_process":16,"through":65}],49:[function(require,module,exports){
 'use strict';
 
 var bind = require('function-bind');
@@ -6516,7 +6604,7 @@ module.exports = function trim() {
 	return replace(replace(S, leftWhitespace, ''), rightWhitespace, '');
 };
 
-},{"es-abstract/es5":54,"function-bind":43}],49:[function(require,module,exports){
+},{"es-abstract/es5":55,"function-bind":44}],50:[function(require,module,exports){
 'use strict';
 
 var bind = require('function-bind');
@@ -6536,7 +6624,7 @@ define(boundTrim, {
 
 module.exports = boundTrim;
 
-},{"./implementation":48,"./polyfill":62,"./shim":63,"define-properties":50,"function-bind":43}],50:[function(require,module,exports){
+},{"./implementation":49,"./polyfill":63,"./shim":64,"define-properties":51,"function-bind":44}],51:[function(require,module,exports){
 'use strict';
 
 var keys = require('object-keys');
@@ -6594,7 +6682,7 @@ defineProperties.supportsDescriptors = !!supportsDescriptors;
 
 module.exports = defineProperties;
 
-},{"foreach":51,"object-keys":52}],51:[function(require,module,exports){
+},{"foreach":52,"object-keys":53}],52:[function(require,module,exports){
 
 var hasOwn = Object.prototype.hasOwnProperty;
 var toString = Object.prototype.toString;
@@ -6618,7 +6706,7 @@ module.exports = function forEach (obj, fn, ctx) {
 };
 
 
-},{}],52:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
 'use strict';
 
 // modified from https://github.com/es-shims/es5-shim
@@ -6760,7 +6848,7 @@ keysShim.shim = function shimObjectKeys() {
 
 module.exports = keysShim;
 
-},{"./isArguments":53}],53:[function(require,module,exports){
+},{"./isArguments":54}],54:[function(require,module,exports){
 'use strict';
 
 var toStr = Object.prototype.toString;
@@ -6779,7 +6867,7 @@ module.exports = function isArguments(value) {
 	return isArgs;
 };
 
-},{}],54:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 'use strict';
 
 var $isNaN = require('./helpers/isNaN');
@@ -6845,28 +6933,28 @@ var ES5 = {
 
 module.exports = ES5;
 
-},{"./helpers/isFinite":55,"./helpers/isNaN":56,"./helpers/mod":57,"./helpers/sign":58,"es-to-primitive/es5":59,"is-callable":61}],55:[function(require,module,exports){
+},{"./helpers/isFinite":56,"./helpers/isNaN":57,"./helpers/mod":58,"./helpers/sign":59,"es-to-primitive/es5":60,"is-callable":62}],56:[function(require,module,exports){
 var $isNaN = Number.isNaN || function (a) { return a !== a; };
 
 module.exports = Number.isFinite || function (x) { return typeof x === 'number' && !$isNaN(x) && x !== Infinity && x !== -Infinity; };
 
-},{}],56:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 module.exports = Number.isNaN || function isNaN(a) {
 	return a !== a;
 };
 
-},{}],57:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 module.exports = function mod(number, modulo) {
 	var remain = number % modulo;
 	return Math.floor(remain >= 0 ? remain : remain + modulo);
 };
 
-},{}],58:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 module.exports = function sign(number) {
 	return number >= 0 ? 1 : -1;
 };
 
-},{}],59:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 'use strict';
 
 var toStr = Object.prototype.toString;
@@ -6905,12 +6993,12 @@ module.exports = function ToPrimitive(input, PreferredType) {
 	return ES5internalSlots['[[DefaultValue]]'](input, PreferredType);
 };
 
-},{"./helpers/isPrimitive":60,"is-callable":61}],60:[function(require,module,exports){
+},{"./helpers/isPrimitive":61,"is-callable":62}],61:[function(require,module,exports){
 module.exports = function isPrimitive(value) {
 	return value === null || (typeof value !== 'function' && typeof value !== 'object');
 };
 
-},{}],61:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
 'use strict';
 
 var fnToStr = Function.prototype.toString;
@@ -6951,7 +7039,7 @@ module.exports = function isCallable(value) {
 	return strClass === fnClass || strClass === genClass;
 };
 
-},{}],62:[function(require,module,exports){
+},{}],63:[function(require,module,exports){
 'use strict';
 
 var implementation = require('./implementation');
@@ -6965,7 +7053,7 @@ module.exports = function getPolyfill() {
 	return implementation;
 };
 
-},{"./implementation":48}],63:[function(require,module,exports){
+},{"./implementation":49}],64:[function(require,module,exports){
 'use strict';
 
 var define = require('define-properties');
@@ -6977,7 +7065,7 @@ module.exports = function shimStringTrim() {
 	return polyfill;
 };
 
-},{"./polyfill":62,"define-properties":50}],64:[function(require,module,exports){
+},{"./polyfill":63,"define-properties":51}],65:[function(require,module,exports){
 (function (process){
 var Stream = require('stream')
 
@@ -7089,7 +7177,7 @@ function through (write, end, opts) {
 
 
 }).call(this,require('_process'))
-},{"_process":16,"stream":32}],65:[function(require,module,exports){
+},{"_process":16,"stream":32}],66:[function(require,module,exports){
 var queryString  = require('query-string')
 var routerParams = require('router-params')
 var location
@@ -7203,7 +7291,7 @@ module.exports = function thataway() {
 
 }
 
-},{"query-string":66,"router-params":69}],66:[function(require,module,exports){
+},{"query-string":67,"router-params":70}],67:[function(require,module,exports){
 'use strict';
 var strictUriEncode = require('strict-uri-encode');
 var objectAssign = require('object-assign');
@@ -7303,92 +7391,9 @@ exports.stringify = function (obj, opts) {
 	}).join('&') : '';
 };
 
-},{"object-assign":67,"strict-uri-encode":68}],67:[function(require,module,exports){
-'use strict';
-/* eslint-disable no-unused-vars */
-var hasOwnProperty = Object.prototype.hasOwnProperty;
-var propIsEnumerable = Object.prototype.propertyIsEnumerable;
-
-function toObject(val) {
-	if (val === null || val === undefined) {
-		throw new TypeError('Object.assign cannot be called with null or undefined');
-	}
-
-	return Object(val);
-}
-
-function shouldUseNative() {
-	try {
-		if (!Object.assign) {
-			return false;
-		}
-
-		// Detect buggy property enumeration order in older V8 versions.
-
-		// https://bugs.chromium.org/p/v8/issues/detail?id=4118
-		var test1 = new String('abc');  // eslint-disable-line
-		test1[5] = 'de';
-		if (Object.getOwnPropertyNames(test1)[0] === '5') {
-			return false;
-		}
-
-		// https://bugs.chromium.org/p/v8/issues/detail?id=3056
-		var test2 = {};
-		for (var i = 0; i < 10; i++) {
-			test2['_' + String.fromCharCode(i)] = i;
-		}
-		var order2 = Object.getOwnPropertyNames(test2).map(function (n) {
-			return test2[n];
-		});
-		if (order2.join('') !== '0123456789') {
-			return false;
-		}
-
-		// https://bugs.chromium.org/p/v8/issues/detail?id=3056
-		var test3 = {};
-		'abcdefghijklmnopqrst'.split('').forEach(function (letter) {
-			test3[letter] = letter;
-		});
-		if (Object.keys(Object.assign({}, test3)).join('') !==
-				'abcdefghijklmnopqrst') {
-			return false;
-		}
-
-		return true;
-	} catch (e) {
-		// We don't expect any of the above to throw, but better to be safe.
-		return false;
-	}
-}
-
-module.exports = shouldUseNative() ? Object.assign : function (target, source) {
-	var from;
-	var to = toObject(target);
-	var symbols;
-
-	for (var s = 1; s < arguments.length; s++) {
-		from = Object(arguments[s]);
-
-		for (var key in from) {
-			if (hasOwnProperty.call(from, key)) {
-				to[key] = from[key];
-			}
-		}
-
-		if (Object.getOwnPropertySymbols) {
-			symbols = Object.getOwnPropertySymbols(from);
-			for (var i = 0; i < symbols.length; i++) {
-				if (propIsEnumerable.call(from, symbols[i])) {
-					to[symbols[i]] = from[symbols[i]];
-				}
-			}
-		}
-	}
-
-	return to;
-};
-
-},{}],68:[function(require,module,exports){
+},{"object-assign":68,"strict-uri-encode":69}],68:[function(require,module,exports){
+arguments[4][34][0].apply(exports,arguments)
+},{"dup":34}],69:[function(require,module,exports){
 'use strict';
 module.exports = function (str) {
 	return encodeURIComponent(str).replace(/[!'()*]/g, function (c) {
@@ -7396,7 +7401,7 @@ module.exports = function (str) {
 	});
 };
 
-},{}],69:[function(require,module,exports){
+},{}],70:[function(require,module,exports){
 var pathToRegexp = require('path-to-regexp')
 
 module.exports = function createPattern(path) {
@@ -7438,7 +7443,7 @@ function decodeValue(value) {
   }
 }
 
-},{"path-to-regexp":70}],70:[function(require,module,exports){
+},{"path-to-regexp":71}],71:[function(require,module,exports){
 var isarray = require('isarray')
 
 /**
@@ -7866,31 +7871,10 @@ function pathToRegexp (path, keys, options) {
   return stringToRegexp(/** @type {string} */ (path), /** @type {!Array} */ (keys), options)
 }
 
-},{"isarray":71}],71:[function(require,module,exports){
+},{"isarray":72}],72:[function(require,module,exports){
 module.exports = Array.isArray || function (arr) {
   return Object.prototype.toString.call(arr) == '[object Array]';
 };
-
-},{}],72:[function(require,module,exports){
-module.exports = extend
-
-var hasOwnProperty = Object.prototype.hasOwnProperty;
-
-function extend() {
-    var target = {}
-
-    for (var i = 0; i < arguments.length; i++) {
-        var source = arguments[i]
-
-        for (var key in source) {
-            if (hasOwnProperty.call(source, key)) {
-                target[key] = source[key]
-            }
-        }
-    }
-
-    return target
-}
 
 },{}],73:[function(require,module,exports){
 var bel = require('bel') // turns template tag into DOM elements
@@ -9290,4 +9274,4 @@ test('should render multiple layers', function(t) {
 
 }()
 
-},{"./":5,"./routes.js":82,"tape":34,"yo-yo":73}]},{},[83]);
+},{"./":5,"./routes.js":82,"tape":35,"yo-yo":73}]},{},[83]);
