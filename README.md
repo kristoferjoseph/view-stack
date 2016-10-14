@@ -53,10 +53,13 @@ var viewStack = createViewStack([
   }
 ])
 
-document.body.appendChild(viewStack)
-//Initial view will be component `A`
-//data passed to components will have a navigate method appended.
+document.body.appendChild(viewStack.element)
+// Initial view will be component `A`
+// data passed to components will have a navigate method appended.
 // data.navigate('/b') proceeds to next route.
+
+// Static render a path
+document.body.appendChild(viewStack.render('/c'))
 ```
 
 ## Test
