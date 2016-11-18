@@ -5,12 +5,12 @@
   "main": "index.js",
   "scripts": {
     "test": "npm run browser-tests",
-    "build": "browserify ./index.js -o ./bundle.js",
-    "build-tests": "browserify ./test.js -o ./public/test.bundle.js",
-    "watch-tests": "watchify ./test.js -o ./public/test.bundle.js",
+    "build": "browserify -t yo-yoify ./index.js -o ./bundle.js",
+    "build-tests": "browserify -t yo-yoify ./test.js -o ./public/test.bundle.js",
+    "watch-tests": "watchify -t yo-yoify ./test.js -o ./public/test.bundle.js",
     "browser-tests": "npm run build-tests && npm start && open http://localhost:6661",
     "start": "node server.js",
-    "umd": "browserify ./index.js --standalone ViewStack | uglifyjs --compress --mangle --screw-ie8 > view-stack.umd.js"
+    "umd": "browserify -t yo-yoify ./index.js --standalone ViewStack | uglifyjs --compress --mangle --screw-ie8 > view-stack.umd.js"
   },
   "repository": {
     "type": "git",
@@ -36,12 +36,12 @@
     "yo-yo": "^1.2.2"
   },
   "devDependencies": {
+    "browserify": "^13.1.0",
     "ejs": "^2.5.1",
     "express": "^4.14.0",
-    "browserify": "^13.1.0",
-    "uglify-js": "git+https://github.com/mishoo/UglifyJS2.git#harmony",
     "tape": "^4.6.0",
+    "uglify-js": "git+https://github.com/mishoo/UglifyJS2.git#harmony",
     "watchify": "^3.7.0",
-    "yo-yoify": "^3.4.0"
+    "yo-yoify": "^3.5.0"
   }
 }
