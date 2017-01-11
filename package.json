@@ -3,6 +3,9 @@
   "version": "10.1.2",
   "description": "Router for stacking views.",
   "main": "index.js",
+  "browserify": {
+    "transform": ["yo-yoify"]
+  },
   "scripts": {
     "test": "npm run browser-tests",
     "build": "browserify -t yo-yoify ./index.js -o ./bundle.js",

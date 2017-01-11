@@ -73,7 +73,7 @@ function Layer(data, store) {
   delete store.callback
   delete store.layer
   return html`
-    <div class="view-stack-${layer}">
+    <div class='view-stack-${layer}'>
       ${component(store)}
     </div>
   `
