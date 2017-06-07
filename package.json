@@ -36,8 +36,10 @@
   },
   "homepage": "https://github.com/kristoferjoseph/view-stack#readme",
   "dependencies": {
+    "in-window": "^2.0.0",
+    "join-classes": "^1.0.0",
     "object-assign": "^4.1.0",
-    "thataway": "^2.1.4",
+    "thataway": "^3.0.0",
     "yo-yo": "^1.2.2"
   },
   "devDependencies": {
