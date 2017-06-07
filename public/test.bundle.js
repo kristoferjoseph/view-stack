@@ -1,6 +1,6 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 var yo = require('yo-yo')
-module.exports = function A() {
+module.exports = function A (store) {
   return (function () {
       
       var ac = require('/Users/kj/Documents/work/view-stack/node_modules/yo-yoify/lib/appendChild.js')
@@ -77,8 +77,8 @@ module.exports = function ViewStack (opts) {
   function format (data) {
     var component = data.callback()
     var options = assign(
-        data,
         store,
+        data,
         {
           navigate: router.navigate,
           component: component
@@ -121,11 +121,12 @@ ac(bel0, ["\n        ",arguments[1],"\n        ",arguments[2],"\n        ",argum
 },{"./layer":6,"/Users/kj/Documents/work/view-stack/node_modules/yo-yoify/lib/appendChild.js":86,"in-window":39,"join-classes":45,"object-assign":47,"thataway":81,"yo-yo":84}],6:[function(require,module,exports){
 var html = require('yo-yo')
 
-module.exports = function Layer (opts) {
-  opts = opts || {}
-  var component = opts.component
-  var layer = opts.layer
-  var store = opts.store
+module.exports = function Layer (store) {
+  var component = store.component
+  var layer = store.layer
+  delete store.callback
+  delete store.component
+  delete store.layer
   return (function () {
       
       var ac = require('/Users/kj/Documents/work/view-stack/node_modules/yo-yoify/lib/appendChild.js')
@@ -133,7 +134,7 @@ module.exports = function Layer (opts) {
 bel0.setAttribute("class", "view-stack-" + arguments[0])
 ac(bel0, ["\n      ",arguments[1],"\n    "])
       return bel0
-    }(layer,component && component(store)))
+    }(layer,component(store)))
 }
 
 },{"/Users/kj/Documents/work/view-stack/node_modules/yo-yoify/lib/appendChild.js":86,"yo-yo":84}],7:[function(require,module,exports){

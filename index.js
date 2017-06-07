@@ -28,8 +28,8 @@ module.exports = function ViewStack (opts) {
   function format (data) {
     var component = data.callback()
     var options = assign(
-        data,
         store,
+        data,
         {
           navigate: router.navigate,
           component: component
