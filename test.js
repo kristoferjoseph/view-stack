@@ -12,10 +12,17 @@ test('ViewStack should exist', function(t) {
   t.end()
 })
 
-test('should expose router', function(t) {
+test('should expose navigate method', function(t) {
   var routes = require('./routes.js').slice()
   var stack = ViewStack({routes: routes})
-  t.ok(stack.router)
+  t.ok(stack.navigate)
+  t.end()
+})
+
+test('should expose subscribe method', function(t) {
+  var routes = require('./routes.js').slice()
+  var stack = ViewStack({routes: routes})
+  t.ok(stack.subscribe)
   t.end()
 })
 
@@ -27,7 +34,7 @@ test('should render to string from a path', function(t) {
     strip(el.outerHTML),
     strip(`
       <div class="view-stack">
-        <div class="view-stack-screens">
+        <div id="view-stack-screens" class="view-stack-screens">
           <h1>A</h1>
         </div>
       </div>
@@ -97,7 +104,7 @@ test('should create element', function(t) {
     strip(document.getElementById('root').innerHTML),
     strip(`
       <div class="view-stack">
-        <div class="view-stack-screens">
+        <div id="view-stack-screens" class="view-stack-screens">
           <h1>A</h1>
         </div>
       </div>
@@ -114,10 +121,10 @@ test('should always render default screen', function(t) {
     strip(element.outerHTML),
     strip(`
       <div class="view-stack">
-        <div class="view-stack-screens">
+        <div id="view-stack-screens" class="view-stack-screens">
           <h1>A</h1>
         </div>
-        <div class="view-stack-modals">
+        <div id="view-stack-modals" class="view-stack-modals">
           <h1>D</h1>
         </div>
       </div>
@@ -133,10 +140,10 @@ test('should render multiple layers', function(t) {
     strip(stack('/c').outerHTML),
     strip(`
       <div class="view-stack">
-        <div class="view-stack-screens">
+        <div id="view-stack-screens" class="view-stack-screens">
           <h1>A</h1>
         </div>
-        <div class="view-stack-sheets">
+        <div id="view-stack-sheets" class="view-stack-sheets">
           <h1>C</h1>
         </div>
       </div>

@@ -92,6 +92,10 @@ module.exports = function ViewStack (opts) {
     layers['sheets'] = null
     layers['modals'] = null
     layers[data.layer] = data
+    var screens = layers.screens
+    var sheets = layers.sheets
+    var modals = layers.modals
+
     return (function () {
       
       var ac = require('/Users/kj/Documents/work/view-stack/node_modules/yo-yoify/lib/appendChild.js')
@@ -99,7 +103,7 @@ module.exports = function ViewStack (opts) {
 bel0.setAttribute("class", arguments[0])
 ac(bel0, ["\n        ",arguments[1],"\n        ",arguments[2],"\n        ",arguments[3],"\n      "])
       return bel0
-    }(classes,layers.screens ? Layer(format(layers.screens)) : null,layers.sheets ? Layer(format(layers.sheets)) : null,layers.modals ? Layer(format(layers.modals)) : null))
+    }(classes,screens ? Layer(format(screens)) : null,sheets ? Layer(format(sheets)) : null,modals ? Layer(format(modals)) : null))
   }
 
   function update (state) {
@@ -113,7 +117,8 @@ ac(bel0, ["\n        ",arguments[1],"\n        ",arguments[2],"\n        ",argum
   }
 
   render.element = element
-  render.router = router
+  render.navigate = router.navigate
+  render.subscribe = router.subscribe
   return render
 }
 
@@ -124,17 +129,18 @@ var html = require('yo-yo')
 module.exports = function Layer (store) {
   var component = store.component
   var layer = store.layer
-  delete store.callback
-  delete store.component
-  delete store.layer
+  var path = store.path
+  var identifier = 'view-stack-' + layer
+
   return (function () {
       
       var ac = require('/Users/kj/Documents/work/view-stack/node_modules/yo-yoify/lib/appendChild.js')
       var bel0 = document.createElement("div")
-bel0.setAttribute("class", "view-stack-" + arguments[0])
-ac(bel0, ["\n      ",arguments[1],"\n    "])
+bel0.setAttribute("id", arguments[0])
+bel0.setAttribute("class", arguments[1])
+ac(bel0, ["\n      ",arguments[2],"\n    "])
       return bel0
-    }(layer,component(store)))
+    }(identifier,identifier,component(store)))
 }
 
 },{"/Users/kj/Documents/work/view-stack/node_modules/yo-yoify/lib/appendChild.js":86,"yo-yo":84}],7:[function(require,module,exports){
@@ -9836,10 +9842,17 @@ test('ViewStack should exist', function(t) {
   t.end()
 })
 
-test('should expose router', function(t) {
+test('should expose navigate method', function(t) {
   var routes = require('./routes.js').slice()
   var stack = ViewStack({routes: routes})
-  t.ok(stack.router)
+  t.ok(stack.navigate)
+  t.end()
+})
+
+test('should expose subscribe method', function(t) {
+  var routes = require('./routes.js').slice()
+  var stack = ViewStack({routes: routes})
+  t.ok(stack.subscribe)
   t.end()
 })
 
@@ -9851,7 +9864,7 @@ test('should render to string from a path', function(t) {
     strip(el.outerHTML),
     strip(`
       <div class="view-stack">
-        <div class="view-stack-screens">
+        <div id="view-stack-screens" class="view-stack-screens">
           <h1>A</h1>
         </div>
       </div>
@@ -9921,7 +9934,7 @@ test('should create element', function(t) {
     strip(document.getElementById('root').innerHTML),
     strip(`
       <div class="view-stack">
-        <div class="view-stack-screens">
+        <div id="view-stack-screens" class="view-stack-screens">
           <h1>A</h1>
         </div>
       </div>
@@ -9938,10 +9951,10 @@ test('should always render default screen', function(t) {
     strip(element.outerHTML),
     strip(`
       <div class="view-stack">
-        <div class="view-stack-screens">
+        <div id="view-stack-screens" class="view-stack-screens">
           <h1>A</h1>
         </div>
-        <div class="view-stack-modals">
+        <div id="view-stack-modals" class="view-stack-modals">
           <h1>D</h1>
         </div>
       </div>
@@ -9957,10 +9970,10 @@ test('should render multiple layers', function(t) {
     strip(stack('/c').outerHTML),
     strip(`
       <div class="view-stack">
-        <div class="view-stack-screens">
+        <div id="view-stack-screens" class="view-stack-screens">
           <h1>A</h1>
         </div>
-        <div class="view-stack-sheets">
+        <div id="view-stack-sheets" class="view-stack-sheets">
           <h1>C</h1>
         </div>
       </div>

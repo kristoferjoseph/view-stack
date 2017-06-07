@@ -43,11 +43,15 @@ module.exports = function ViewStack (opts) {
     layers['sheets'] = null
     layers['modals'] = null
     layers[data.layer] = data
+    var screens = layers.screens
+    var sheets = layers.sheets
+    var modals = layers.modals
+
     return html`
       <div class=${classes}>
-        ${layers.screens ? Layer(format(layers.screens)) : null}
-        ${layers.sheets ? Layer(format(layers.sheets)) : null}
-        ${layers.modals ? Layer(format(layers.modals)) : null}
+        ${screens ? Layer(format(screens)) : null}
+        ${sheets ? Layer(format(sheets)) : null}
+        ${modals ? Layer(format(modals)) : null}
       </div>
     `
   }
@@ -63,7 +67,8 @@ module.exports = function ViewStack (opts) {
   }
 
   render.element = element
-  render.router = router
+  render.navigate = router.navigate
+  render.subscribe = router.subscribe
   return render
 }
 
