@@ -6,107 +6,87 @@ function strip(str) {
   return str.replace(/\s+/g, '')
 }
 
-module.exports = function() {
-test('ViewStack should exist', function(t) {
-  t.ok(ViewStack)
+test('ViewStack', function(t) {
+  t.ok(ViewStack, 'ViewStack exists')
+  t.end()
+})
+
+test('should parse paths', function(t) {
+  var stack = ViewStack({
+     paths: {
+       screens: {
+         '/': t=> {html`<h1>Home</h1>`}
+       },
+       sheets: {
+         '/a': t=> {html`<h1>A</h1>`}
+       },
+       modals: {
+         '/b': t=> {html`<h1>B</h1>`}
+       }
+     }
+  })
+  t.ok(stack, 'parses paths')
   t.end()
 })
 
 test('should expose navigate method', function(t) {
-  var routes = require('./routes.js').slice()
-  var stack = ViewStack({routes: routes})
-  t.ok(stack.navigate)
+  var paths = Object.assign({}, require('./paths.js'))
+  var stack = ViewStack({paths: paths})
+  t.ok(stack.navigate, 'navigate method exists')
   t.end()
 })
 
 test('should expose subscribe method', function(t) {
-  var routes = require('./routes.js').slice()
-  var stack = ViewStack({routes: routes})
-  t.ok(stack.subscribe)
+  var paths = Object.assign({}, require('./paths.js'))
+  var stack = ViewStack({paths: paths})
+  t.ok(stack.subscribe, 'subscribe method exists')
   t.end()
 })
 
 test('should render to string from a path', function(t) {
-  var routes = require('./routes.js').slice()
-  var stack = ViewStack({routes: routes})
+  var paths = Object.assign({}, require('./paths.js'))
+  var stack = ViewStack({paths: paths, viewClasses:'stack'})
   var el = stack('/a')
   t.equal(
     strip(el.outerHTML),
     strip(`
       <div class="view-stack">
-        <div id="view-stack-screens" class="view-stack-screens">
+        <section class="stack">
           <h1>A</h1>
-        </div>
+        </section>
+        <section class="stack">
+        </section>
+        <section class="stack">
+        </section>
       </div>
     `),
     'Renders to string from path')
   t.end()
 })
 
-test('should add routes as array', function (t) {
-  var routes = require('./routes.js').slice()
-  t.doesNotThrow(
-    function () {
-      ViewStack({
-        routes: [{
-          path: '/',
-          data: {
-            callback: function() {
-              return function(data) {
-                console.log('DATA:', data)
-              }
-            }
-          }
-        }]
-      })
-    },
-    Error
-  )
-  t.end()
-})
-
-test('should add single route', function (t) {
-  var routes = require('./routes.js').slice()
-  t.doesNotThrow(
-    function () {
-      ViewStack({
-        routes: [{
-          path: '/a',
-          data: {
-            callback: function () {
-              return function(data) {
-                console.log('DATA:', data)
-              }
-            }
-          }
-        }],
-        path: '/a'
-      })
-    },
-    Error
-  )
-  t.end()
-})
-
 test('should return element',function(t){
-  var routes = require('./routes.js').slice()
-  var element = ViewStack({routes: routes}).element
+  var paths = Object.assign({}, require('./paths.js'))
+  var element = ViewStack({paths: paths}).element
   t.ok(element)
   t.end()
 })
 
 test('should create element', function(t) {
-  var routes = require('./routes.js').slice()
-  var element = ViewStack({routes: routes}).element
+  var paths = Object.assign({}, require('./paths.js'))
+  var element = ViewStack({paths: paths, viewClasses:'stack'}).element
   var root = document.getElementById('root')
   root.appendChild(element)
   t.equal(
     strip(document.getElementById('root').innerHTML),
     strip(`
       <div class="view-stack">
-        <div id="view-stack-screens" class="view-stack-screens">
+        <section class="stack">
           <h1>A</h1>
-        </div>
+        </section>
+        <section class="stack">
+        </section>
+        <section class="stack">
+        </section>
       </div>
     `)
   )
@@ -115,18 +95,20 @@ test('should create element', function(t) {
 })
 
 test('should always render default screen', function(t) {
-  var routes = require('./routes.js').slice()
-  var element = ViewStack({routes: routes})('/d')
+  var paths = Object.assign({}, require('./paths.js'))
+  var element = ViewStack({paths: paths, viewClasses: 'stacks'})('/d')
   t.equal(
     strip(element.outerHTML),
     strip(`
       <div class="view-stack">
-        <div id="view-stack-screens" class="view-stack-screens">
+        <section class="stacks">
           <h1>A</h1>
-        </div>
-        <div id="view-stack-modals" class="view-stack-modals">
+        </section>
+        <section class="stacks">
+        </section>
+        <section class="stacks">
           <h1>D</h1>
-        </div>
+        </section>
       </div>
     `)
   )
@@ -134,22 +116,23 @@ test('should always render default screen', function(t) {
 })
 
 test('should render multiple layers', function(t) {
-  var routes = require('./routes.js').slice()
-  var stack = ViewStack({routes: routes})
+  var paths = Object.assign({}, require('./paths.js'))
+  var stack = ViewStack({paths: paths, viewClasses: 'stacks'})
   t.equal(
     strip(stack('/c').outerHTML),
     strip(`
       <div class="view-stack">
-        <div id="view-stack-screens" class="view-stack-screens">
+        <section class="stacks">
           <h1>A</h1>
-        </div>
-        <div id="view-stack-sheets" class="view-stack-sheets">
+        </section>
+        <section class="stacks">
           <h1>C</h1>
-        </div>
+        </section>
+        <section class="stacks">
+        </section>
       </div>
     `)
   )
   t.end()
 })
 
-}()

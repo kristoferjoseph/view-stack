@@ -9,55 +9,55 @@ view stack signature is:
 
 ```
 ViewStack({
-  routes,
-  path,
-  store
+  paths: Object,
+  path: String,
+  store: Function
 })
 ```
 
-routes is an Array of route objects
-route is an Object with the keys:
-  - path: The url or pattern to match
-  - data: Object with the keys:
-      - layer: Name of layer (Modals, Sheets etc.)
-      - callback: function that returns the component to render into the layer
+paths: An object that looks like this
+```
+ {
+   // name of layer
+   screens: {
+     // WARN: root route '/' must be defined
+     '/': t=> {html`<h1>A</h1>`},
+     // path : function that returns an HTML Element
+     '/a': t=> {html`<h1>A</h1>`}
+   },
+   sheets: {
+     '/b': t=> {html`<h1>B</h1>`}
+   },
+   modals: {
+     '/c': t=> {html`<h1>C</h1>`}
+   }
+}
+```
 
-path is a url pathname fragment for use in server side render defaults to location.pathname or '/'
+path: `'/a'` the initial url to render
 
 store see [redeux](https://github.com/kristoferjoseph/redeux)
 
 ```
-var createViewStack = require('view-stack')
-var viewStack = createViewStack({
-  routes: [
-    {
-      path: '/',
-      data: {
-        persist: true,
-        layer: 'screens',
-        callback: function() {
-          return require('./components/a')
-        }
-      }
-    }, {
-      path: '/b',
-      data: {
-        layer: 'sheets',
-        callback: function() {
-          return require('./components/b')
-        }
-      }
-    }, {
-      path: '/c',
-      data: {
-        layer: 'modals',
-        callback: function() {
-          return require('./components/c')
-        }
-      }
+var render = require('view-stack')({
+  path: '/a',
+  paths: {
+    // name of layer
+    screens: {
+     // WARN: root route '/' must be defined
+     '/': t=> {html`<h1>A</h1>`},
+     // path : function that returns an HTML Element
+     '/a': t=> {html`<h1>A</h1>`}
+    },
+    sheets: {
+    '/b': t=> {html`<h1>B</h1>`}
+    },
+    modals: {
+    '/c': t=> {html`<h1>C</h1>`}
     }
-  ]
-)
+  },
+  store: {}
+})
 
 document.body.appendChild(viewStack.element)
 // Initial view will be component `A`
@@ -65,10 +65,10 @@ document.body.appendChild(viewStack.element)
 // data.navigate('/b') proceeds to next route.
 
 // Static render a path
-document.body.appendChild(viewStack('/c'))
+document.body.appendChild(render('/c'))
 ```
 
 ## Test
-`npm test`
+`npm it`
 
 

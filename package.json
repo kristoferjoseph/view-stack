@@ -38,8 +38,10 @@
   "dependencies": {
     "in-window": "^2.0.0",
     "join-classes": "^1.0.0",
+    "nanomorph": "^5.1.2",
     "object-assign": "^4.1.0",
-    "thataway": "^3.0.0",
+    "stack-view": "^1.0.0",
+    "thataway": "^3.0.1",
     "yo-yo": "^1.2.2"
   },
   "devDependencies": {
