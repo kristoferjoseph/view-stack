@@ -17,20 +17,20 @@ ViewStack({
 
 paths: An object that looks like this
 ```
- {
-   // name of layer
-   screens: {
-     // WARN: root route '/' must be defined
-     '/': t=> {html`<h1>A</h1>`},
-     // path : function that returns an HTML Element
-     '/a': t=> {html`<h1>A</h1>`}
-   },
-   sheets: {
-     '/b': t=> {html`<h1>B</h1>`}
-   },
-   modals: {
-     '/c': t=> {html`<h1>C</h1>`}
-   }
+{
+  // name of layer
+  screens: {
+   // WARN: root route '/' must be defined
+   '/': callback=> {callback(html`<h1>A</h1>`)},
+   // path : function that returns an HTML Element to a callback
+   '/a': callback=> {callback(html`<h1>A</h1>`)}
+  },
+  sheets: {
+   '/b': callback=> {callback(html`<h1>B</h1>`)}
+  },
+  modals: {
+   '/c': callback=> {callback(html`<h1>C</h1>`)}
+  }
 }
 ```
 
@@ -45,15 +45,15 @@ var render = require('view-stack')({
     // name of layer
     screens: {
      // WARN: root route '/' must be defined
-     '/': t=> {html`<h1>A</h1>`},
-     // path : function that returns an HTML Element
-     '/a': t=> {html`<h1>A</h1>`}
+     '/': callback=> {callback(html`<h1>A</h1>`)},
+     // path : function that returns an HTML Element to a callback
+     '/a': callback=> {callback(html`<h1>A</h1>`)}
     },
     sheets: {
-    '/b': t=> {html`<h1>B</h1>`}
+     '/b': callback=> {callback(html`<h1>B</h1>`)}
     },
     modals: {
-    '/c': t=> {html`<h1>C</h1>`}
+     '/c': callback=> {callback(html`<h1>C</h1>`)}
     }
   },
   store: {}

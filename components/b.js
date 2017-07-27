@@ -1,4 +1,4 @@
-var yo = require('yo-yo')
+var html = require('bel')
 module.exports = function B() {
-  return yo`<h1>B</h1>`
+  return html`<h1>B</h1>`
 }

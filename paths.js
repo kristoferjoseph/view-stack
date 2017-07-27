@@ -1,23 +1,23 @@
 module.exports = {
   'screens': {
-    '/': function(store) {
-      return require('./components/a')(store)
+    '/': function(callback) {
+      callback(require('./components/a'))
     },
-    '/a': function(store) {
-      return require('./components/a')(store)
+    '/a': function(callback) {
+      callback(require('./components/a'))
     },
-    '/b': function(store) {
-      return require('./components/b')(store)
+    '/b': function(callback) {
+      callback(require('./components/b'))
     }
   },
   'sheets': {
-    '/c': function(store) {
-      return require('./components/c')(store)
+    '/c': function(callback) {
+      callback(require('./components/c'))
     }
   },
   'modals': {
-    '/d': function(store) {
-      return require('./components/d')(store)
+    '/d': function(callback) {
+      callback(require('./components/d'))
     }
   }
 }

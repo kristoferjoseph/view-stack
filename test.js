@@ -1,5 +1,5 @@
 var test = require('tape')
-var html = require('yo-yo')
+var html = require('bel')
 var ViewStack = require('./')
 
 function strip(str) {
@@ -15,13 +15,13 @@ test('should parse paths', function(t) {
   var stack = ViewStack({
      paths: {
        screens: {
-         '/': t=> {html`<h1>Home</h1>`}
+         '/': c=> {c(store=> { return html`<h1>Home</h1>` })}
        },
        sheets: {
-         '/a': t=> {html`<h1>A</h1>`}
+         '/a': c=> {c(store=> {html`<h1>A</h1>`})}
        },
        modals: {
-         '/b': t=> {html`<h1>B</h1>`}
+         '/b': c=> {c(store=> {html`<h1>B</h1>`})}
        }
      }
   })

@@ -23,14 +23,14 @@ module.exports = function ViewStack (opts) {
    * paths: {
    *   screens: {
    *     // WARN: root route '/' must be defined
-   *     '/': t=> {html`<h1>A</h1>`},
-   *     '/a': t=> {html`<h1>A</h1>`}
+   *     '/': c=> {c(html`<h1>A</h1>`)},
+   *     '/a': c=> {c(html`<h1>A</h1>`)}
    *   },
    *   sheets: {
-   *     '/b': t=> {html`<h1>B</h1>`}
+   *     '/b': c=> {c(html`<h1>B</h1>`)}
    *   },
    *   modals: {
-   *     '/c': t=> {html`<h1>C</h1>`}
+   *     '/c': c=> {c(html`<h1>C</h1>`)}
    *   }
    * }
    *
@@ -91,8 +91,11 @@ module.exports = function ViewStack (opts) {
   function update (state) {
     var back = state.back
     var stack = layers[state.layer]
-    var component = state.component
-    back ? stack.pop() : stack.replace(component)
+    var component = state.component(
+      function load (view) {
+        back ? stack.pop() : stack.replace(view)
+      }
+    )
   }
 
   function render (path) {
