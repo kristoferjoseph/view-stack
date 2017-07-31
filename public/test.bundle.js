@@ -55,6 +55,9 @@ var inWindow = require('in-window')
 var joinClasses = require('join-classes')
 var location = inWindow ? window.location : { pathname: '/' }
 var Stack = require('stack-view')
+var REPLACE = 'replace'
+var REMOVE = 'remove'
+var PUSH = 'push'
 
 module.exports = function ViewStack (opts) {
   opts = opts || {}
@@ -123,6 +126,26 @@ module.exports = function ViewStack (opts) {
     )
   }
 
+  function navigate (opts) {
+    opts = opts || {}
+    var action = opts.action
+    var path = opts.path
+    var data = opts.data
+    var title = opts.title
+    var layer = opts.layer || layers[0]
+    var component = opts.component
+    update({
+      action: action,
+      layer: layer,
+      component: component
+    })
+    router.navigate(path, data, title)
+  }
+
+  navigate.REMOVE = REMOVE
+  navigate.REPLACE = REPLACE
+  navigate.PUSH = PUSH
+
   router.subscribe(update)
 
   function create () {
@@ -142,10 +165,11 @@ ac(bel0, ["\n        ",arguments[1],"\n      "])
 
   function update (state) {
     var back = state.back
+    var action = state.action || REPLACE
     var stack = layers[state.layer]
     var component = state.component(
       function load (view) {
-        back ? stack.pop() : stack.replace(view)
+        back ? stack.pop() : stack[action](view)
       }
     )
   }
@@ -161,7 +185,7 @@ ac(bel0, ["\n        ",arguments[1],"\n      "])
   render(path)
 
   render.element = element
-  render.navigate = router.navigate
+  render.navigate = navigate
   render.register = register
   render.subscribe = router.subscribe
   return render

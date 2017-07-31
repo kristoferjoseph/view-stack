@@ -15,7 +15,7 @@
     "watch-tests": "watchify -t yo-yoify ./test.js -o ./public/test.bundle.js",
     "browser-tests": "npm run build-tests && npm start && open http://localhost:6661",
     "start": "node server.js",
-    "umd": "browserify -t yo-yoify ./index.js --standalone ViewStack | uglifyjs --compress --mangle --screw-ie8 > view-stack.umd.js"
+    "umd": "browserify -t yo-yoify ./index.js --standalone ViewStack | uglifyjs --compress --mangle > view-stack.umd.js"
   },
   "repository": {
     "type": "git",
