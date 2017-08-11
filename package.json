@@ -1,6 +1,6 @@
 {
   "name": "view-stack",
-  "version": "14.1.0",
+  "version": "14.1.1",
   "description": "Router for stacking views.",
   "main": "index.js",
   "browserify": {
