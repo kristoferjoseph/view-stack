@@ -83,7 +83,7 @@ module.exports = function ViewStack (opts) {
     var path = opts.path
     var data = opts.data
     var title = opts.title
-    var layer = opts.layer || layers[0]
+    var layer = opts.layer
     var component = opts.component
     update({
       action: action,
@@ -114,7 +114,7 @@ module.exports = function ViewStack (opts) {
   function update (state) {
     var back = state.back
     var action = state.action || REPLACE
-    var stack = layers[state.layer]
+    var stack = layers[state.layer] || layers[0]
     var component = state.component(
       function load (view) {
         back ? stack.pop() : stack[action](view)
