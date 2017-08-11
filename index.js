@@ -125,8 +125,9 @@ module.exports = function ViewStack (opts) {
   function render (path) {
     var data = router(path)
     data && update(data)
-    morph(element, create())
-    return element
+    return inWindow ?
+      morph(element, create()) :
+      create()
   }
 
   element = create()
