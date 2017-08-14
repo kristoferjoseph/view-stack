@@ -167,7 +167,7 @@ ac(bel0, ["\n        ",arguments[1],"\n      "])
     var back = state.back
     var action = state.action || REPLACE
     var stack = layers[state.layer] || layers[0]
-    var component = state.component(
+    var component = state.component && state.component(
       function load (view) {
         back ? stack.pop() : stack[action](view)
       }
