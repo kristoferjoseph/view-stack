@@ -22,23 +22,6 @@ module.exports = function ViewStack (opts) {
   var element
   var data
 
-  /*
-   * paths: {
-   *   screens: {
-   *     // WARN: root route '/' must be defined
-   *     '/': c=> {c(html`<h1>A</h1>`)},
-   *     '/a': c=> {c(html`<h1>A</h1>`)}
-   *   },
-   *   sheets: {
-   *     '/b': c=> {c(html`<h1>B</h1>`)}
-   *   },
-   *   modals: {
-   *     '/c': c=> {c(html`<h1>C</h1>`)}
-   *   }
-   * }
-   *
-   */
-
   function keys (o, f) {
     var i = 0
     var keys = Object.keys(o)
@@ -117,7 +100,7 @@ module.exports = function ViewStack (opts) {
     var stack = layers[state.layer] || layers[0]
     var component = state.component && state.component(
       function load (view) {
-        back ? stack.pop() : stack[action](view)
+        stack[action](view)
       }
     )
   }

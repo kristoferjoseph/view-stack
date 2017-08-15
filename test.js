@@ -15,13 +15,13 @@ test('should parse paths', function(t) {
   var stack = ViewStack({
      paths: {
        screens: {
-         '/': c=> {c(store=> { return html`<h1>Home</h1>` })}
+         '/': c=> { c( store=> { return html`<h1>Home</h1>` })}
        },
        sheets: {
-         '/a': c=> {c(store=> {html`<h1>A</h1>`})}
+         '/a': c=> { c( store=> { return html`<h1>A</h1>` })}
        },
        modals: {
-         '/b': c=> {c(store=> {html`<h1>B</h1>`})}
+         '/b': c=> { c( store=> { return html`<h1>B</h1>` })}
        }
      }
   })
@@ -61,6 +61,7 @@ test('should render to string from a path', function(t) {
       </div>
     `),
     'Renders to string from path')
+  el.innerHTML = ''
   t.end()
 })
 

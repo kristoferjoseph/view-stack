@@ -71,23 +71,6 @@ module.exports = function ViewStack (opts) {
   var element
   var data
 
-  /*
-   * paths: {
-   *   screens: {
-   *     // WARN: root route '/' must be defined
-   *     '/': c=> {c(html`<h1>A</h1>`)},
-   *     '/a': c=> {c(html`<h1>A</h1>`)}
-   *   },
-   *   sheets: {
-   *     '/b': c=> {c(html`<h1>B</h1>`)}
-   *   },
-   *   modals: {
-   *     '/c': c=> {c(html`<h1>C</h1>`)}
-   *   }
-   * }
-   *
-   */
-
   function keys (o, f) {
     var i = 0
     var keys = Object.keys(o)
@@ -169,7 +152,7 @@ ac(bel0, ["\n        ",arguments[1],"\n      "])
     var stack = layers[state.layer] || layers[0]
     var component = state.component && state.component(
       function load (view) {
-        back ? stack.pop() : stack[action](view)
+        stack[action](view)
       }
     )
   }
@@ -10577,7 +10560,7 @@ test('should parse paths', function(t) {
   var stack = ViewStack({
      paths: {
        screens: {
-         '/': c=> {c(store=> { return (function () {
+         '/': c=> { c( store=> { return (function () {
       
       var ac = require('/Users/kj/Documents/work/view-stack/node_modules/yo-yoify/lib/appendChild.js')
       var bel0 = document.createElement("h1")
@@ -10586,22 +10569,22 @@ ac(bel0, ["Home"])
     }()) })}
        },
        sheets: {
-         '/a': c=> {c(store=> {(function () {
+         '/a': c=> { c( store=> { return (function () {
       
       var ac = require('/Users/kj/Documents/work/view-stack/node_modules/yo-yoify/lib/appendChild.js')
       var bel0 = document.createElement("h1")
 ac(bel0, ["A"])
       return bel0
-    }())})}
+    }()) })}
        },
        modals: {
-         '/b': c=> {c(store=> {(function () {
+         '/b': c=> { c( store=> { return (function () {
       
       var ac = require('/Users/kj/Documents/work/view-stack/node_modules/yo-yoify/lib/appendChild.js')
       var bel0 = document.createElement("h1")
 ac(bel0, ["B"])
       return bel0
-    }())})}
+    }()) })}
        }
      }
   })
@@ -10641,6 +10624,7 @@ test('should render to string from a path', function(t) {
       </div>
     `),
     'Renders to string from path')
+  el.innerHTML = ''
   t.end()
 })
 
