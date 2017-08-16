@@ -3,7 +3,7 @@ var html = require('bel')
 var ViewStack = require('./')
 
 function strip(str) {
-  return str.replace(/\s+/g, '')
+  return str && str.replace(/\s+/g, '')
 }
 
 test('ViewStack', function(t) {

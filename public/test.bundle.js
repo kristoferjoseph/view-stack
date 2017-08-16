@@ -160,15 +160,12 @@ ac(bel0, ["\n        ",arguments[1],"\n      "])
   function render (path) {
     var data = router(path)
     data && update(data)
-    return inWindow ?
+    return inWindow && element ?
       morph(element, create()) :
       create()
   }
 
-  element = create()
-  render(path)
-
-  render.element = element
+  render.element = render(path)
   render.navigate = navigate
   render.register = register
   render.subscribe = router.subscribe
@@ -8245,25 +8242,25 @@ module.exports = function StackView (opts) {
 
   function push (v) {
     views.push(v)
-    update()
+    render()
     return views.length
   }
 
   function pop () {
     views.pop()
-    update()
+    render()
     return views.length
   }
 
   function remove (v) {
     views.splice(views.indexOf(v), 1)
-    update()
+    render()
     return views.length
   }
 
   function replace (v) {
     views = [v]
-    update()
+    render()
     return views.length
   }
 
@@ -8277,20 +8274,21 @@ module.exports = function StackView (opts) {
     `
   }
 
-  function update () {
-    inWindow &&
-    views && views.length &&
-    morph(element, create(views))
+  function render () {
+    return views &&
+      views.length &&
+      inWindow &&
+      element ?
+      morph(element, create(views)) :
+      create(views)
   }
-
-  element = create(views)
 
   return {
     push: push,
     pop: pop,
     replace: replace,
     remove: remove,
-    element: element
+    get element() { return render(views) }
   }
 }
 
@@ -10548,7 +10546,7 @@ var html = {}
 var ViewStack = require('./')
 
 function strip(str) {
-  return str.replace(/\s+/g, '')
+  return str && str.replace(/\s+/g, '')
 }
 
 test('ViewStack', function(t) {

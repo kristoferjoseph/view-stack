@@ -9,10 +9,11 @@
     ]
   },
   "scripts": {
-    "test": "npm run browser-tests",
+    "test": "npm run server-tests && npm run browser-tests",
     "build": "browserify -t yo-yoify ./index.js -o ./bundle.js",
     "build-tests": "browserify -t yo-yoify ./test.js -o ./public/test.bundle.js",
     "watch-tests": "watchify -t yo-yoify ./test.js -o ./public/test.bundle.js",
+    "server-tests": "tape ./test.static.js | tap-spec",
     "browser-tests": "npm run build-tests && npm start && open http://localhost:6661",
     "start": "node server.js",
     "umd": "browserify -t yo-yoify ./index.js --standalone ViewStack | uglifyjs --compress --mangle > view-stack.umd.js"
@@ -41,13 +42,14 @@
     "join-classes": "^1.0.0",
     "nanomorph": "^5.1.2",
     "object-assign": "^4.1.0",
-    "stack-view": "^1.0.0",
+    "stack-view": "^1.1.0",
     "thataway": "^3.0.1"
   },
   "devDependencies": {
     "browserify": "^13.1.0",
     "ejs": "^2.5.1",
     "express": "^4.14.0",
+    "tap-spec": "^4.1.1",
     "tape": "^4.6.0",
     "uglify-js": "git+https://github.com/mishoo/UglifyJS2.git#harmony",
     "watchify": "^3.7.0",
