@@ -50,39 +50,33 @@ ac(bel0, ["D"])
 var html = {}
 var morph = require('nanomorph')
 var router = require('thataway')()
-var assign = require('object-assign')
 var inWindow = require('in-window')
 var joinClasses = require('join-classes')
-var location = inWindow ? window.location : { pathname: '/' }
 var Stack = require('stack-view')
-var REPLACE = 'replace'
-var REMOVE = 'remove'
-var PUSH = 'push'
+var isFunction = function (f) { return typeof f === 'function' }
 
 module.exports = function ViewStack (opts) {
   opts = opts || {}
   var store = opts.store || {}
-  var path = opts.path || location.pathname
   var paths = opts.paths || {}
   var classes = joinClasses(opts.classes, 'view-stack')
   var viewClasses = opts.viewClasses
   var layers = {}
   var routes
   var element
-  var data
 
   function keys (o, f) {
     var i = 0
     var keys = Object.keys(o)
     var l = keys.length
-    for (i; i<l; i++) {
+    for (i; i < l; i++) {
       f(keys[i])
     }
   }
 
-  keys(paths, function(layer) {
+  keys(paths, function (layer) {
     routes = paths[layer]
-    keys(routes, function(path) {
+    keys(routes, function (path) {
       register({
         path: path,
         layer: layer,
@@ -96,7 +90,12 @@ module.exports = function ViewStack (opts) {
     var path = opts.path
     var layer = opts.layer
     var component = opts.component
-    layers[layer] = Stack({store: store, classes: viewClasses})
+    // Navigate added to store so that subcomponents can use it
+    store.navigate = navigate
+    layers[layer] = Stack({
+      store: store,
+      classes: viewClasses
+    })
     path &&
     layer &&
     component &&
@@ -109,25 +108,14 @@ module.exports = function ViewStack (opts) {
     )
   }
 
-  function navigate (opts) {
-    opts = opts || {}
-    var action = opts.action
-    var path = opts.path
-    var data = opts.data
-    var title = opts.title
-    var layer = opts.layer
-    var component = opts.component
-    update({
-      action: action,
-      layer: layer,
-      component: component
-    })
+  function navigate (args) {
+    args = args || {}
+    var path = args.path
+    var data = args.data
+    var title = args.title
+
     router.navigate(path, data, title)
   }
-
-  navigate.REMOVE = REMOVE
-  navigate.REPLACE = REPLACE
-  navigate.PUSH = PUSH
 
   router.subscribe(update)
 
@@ -141,38 +129,46 @@ ac(bel0, ["\n        ",arguments[1],"\n      "])
       return bel0
     }(classes,Object.keys(layers).map(
             function (l) {
-              return layers[l].element
+              return layers[l]()
             }
         )))
   }
 
   function update (state) {
-    var back = state.back
-    var action = state.action || REPLACE
-    var stack = layers[state.layer] || layers[0]
-    var component = state.component && state.component(
-      function load (view) {
-        stack[action](view)
-      }
-    )
+    var action = state.action || 'replace'
+    var layer = state.layer || Object.keys(layers)[0]
+    var component = state.component || ''
+    var stack = layers[layer]
+
+    function load (component) {
+      stack[action](component)
+    }
+
+    isFunction(component)
+    ? component(load)
+    : load(component)
+
+    return render()
   }
 
   function render (path) {
-    var data = router(path)
-    data && update(data)
-    return inWindow && element ?
-      morph(element, create()) :
-      create()
+    path && navigate({path: path})
+    element = inWindow && element
+      ? morph(element, create())
+      : create()
+
+    return element
   }
 
-  render.element = render(path)
   render.navigate = navigate
+  render.update = update
   render.register = register
   render.subscribe = router.subscribe
+
   return render
 }
 
-},{"/Users/kj/Documents/work/view-stack/node_modules/yo-yoify/lib/appendChild.js":87,"in-window":37,"join-classes":43,"nanomorph":44,"object-assign":47,"stack-view":69,"thataway":81}],6:[function(require,module,exports){
+},{"/Users/kj/Documents/work/view-stack/node_modules/yo-yoify/lib/appendChild.js":87,"in-window":37,"join-classes":43,"nanomorph":44,"stack-view":69,"thataway":81}],6:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -8231,65 +8227,58 @@ function decodeValue(value) {
 var html = require('bel')
 var morph = require('nanomorph')
 var inWindow = require('in-window')
+var isFunction = v=> { return 'function' === typeof v }
 function noop () {}
 
 module.exports = function StackView (opts) {
   opts = opts || {}
   var store = opts.store || noop
   var classes = opts.classes || ''
-  var views = []
+  var views = opts.views || []
   var element
 
   function push (v) {
     views.push(v)
-    render()
-    return views.length
+    return render()
   }
 
   function pop () {
     views.pop()
-    render()
-    return views.length
+    return render()
   }
 
   function remove (v) {
     views.splice(views.indexOf(v), 1)
-    render()
-    return views.length
+    return render()
   }
 
   function replace (v) {
     views = [v]
-    render()
-    return views.length
+    return render()
   }
 
-  function create () {
+  function create (views) {
     return html`
       <section class=${classes}>
         ${views.map(v=> {
-          return v(store)
+          return isFunction(v) ? v(store) : v
         })}
       </section>
     `
   }
 
   function render () {
-    return views &&
-      views.length &&
-      inWindow &&
-      element ?
+    return inWindow && element ?
       morph(element, create(views)) :
       create(views)
   }
 
-  return {
-    push: push,
-    pop: pop,
-    replace: replace,
-    remove: remove,
-    get element() { return render(views) }
-  }
+  render.push = push
+  render.pop = pop
+  render.remove = remove
+  render.replace = replace
+
+  return render
 }
 
 },{"bel":8,"in-window":37,"nanomorph":44}],70:[function(require,module,exports){
@@ -9644,7 +9633,7 @@ module.exports = function thataway (paths) {
   }
 
   function should (path) {
-    return path !== trim(location.pathname)
+    return path && path !== trim(location.pathname)
   }
 
   function back () {
@@ -9671,7 +9660,7 @@ module.exports = function thataway (paths) {
   }
 
   function trim (path) {
-    return path === '/' ? path : path.replace(/\/*$/, '')
+    return path === '/' ? path : path && path.replace(/\/*$/, '')
   }
 
   function match (path) {
@@ -10587,6 +10576,7 @@ ac(bel0, ["B"])
      }
   })
   t.ok(stack, 'parses paths')
+  stack = null
   t.end()
 })
 
@@ -10595,12 +10585,14 @@ test('should expose navigate method', function(t) {
   var stack = ViewStack({paths: paths})
   t.ok(stack.navigate, 'navigate method exists')
   t.end()
+  stack = null
 })
 
 test('should expose subscribe method', function(t) {
   var paths = Object.assign({}, require('./paths.js'))
   var stack = ViewStack({paths: paths})
   t.ok(stack.subscribe, 'subscribe method exists')
+  stack = null
   t.end()
 })
 
@@ -10623,19 +10615,20 @@ test('should render to string from a path', function(t) {
     `),
     'Renders to string from path')
   el.innerHTML = ''
+  stack = null
   t.end()
 })
 
 test('should return element',function(t){
   var paths = Object.assign({}, require('./paths.js'))
-  var element = ViewStack({paths: paths}).element
+  var element = ViewStack({paths: paths})()
   t.ok(element)
   t.end()
 })
 
 test('should create element', function(t) {
   var paths = Object.assign({}, require('./paths.js'))
-  var element = ViewStack({paths: paths, viewClasses:'stack'}).element
+  var element = ViewStack({paths: paths, viewClasses:'stack'})('/a')
   var root = document.getElementById('root')
   root.appendChild(element)
   t.equal(
@@ -10656,30 +10649,10 @@ test('should create element', function(t) {
   t.end()
 })
 
-test('should always render default screen', function(t) {
-  var paths = Object.assign({}, require('./paths.js'))
-  var element = ViewStack({paths: paths, viewClasses: 'stacks'})('/d')
-  t.equal(
-    strip(element.outerHTML),
-    strip(`
-      <div class="view-stack">
-        <section class="stacks">
-          <h1>A</h1>
-        </section>
-        <section class="stacks">
-        </section>
-        <section class="stacks">
-          <h1>D</h1>
-        </section>
-      </div>
-    `)
-  )
-  t.end()
-})
-
 test('should render multiple layers', function(t) {
   var paths = Object.assign({}, require('./paths.js'))
   var stack = ViewStack({paths: paths, viewClasses: 'stacks'})
+  stack('/a')
   t.equal(
     strip(stack('/c').outerHTML),
     strip(`
@@ -10695,9 +10668,132 @@ test('should render multiple layers', function(t) {
       </div>
     `)
   )
+  stack = null
   t.end()
 })
 
 
+test('update', function(t) {
+  var paths = Object.assign({}, require('./paths.js'))
+  var stack = ViewStack({paths: paths, viewClasses: 'stacks'})
+  t.ok(stack.update, 'is exported')
+  stack = null
+  t.end()
+})
+
+test('should update a layer', function(t) {
+  var paths = Object.assign({}, require('./paths.js'))
+  var stack = ViewStack({paths: paths, viewClasses: 'stacks'})
+  stack('/a')
+
+  t.test('push', function (t) {
+    stack.update({
+      action: 'push',
+      component: (function () {
+      
+      var ac = require('/Users/kj/Documents/work/view-stack/node_modules/yo-yoify/lib/appendChild.js')
+      var bel0 = document.createElement("h1")
+ac(bel0, ["B"])
+      return bel0
+    }())
+    })
+    t.equal(
+      strip(stack('/c').outerHTML),
+      strip(`
+        <div class="view-stack">
+          <section class="stacks">
+            <h1>A</h1>
+            <h1>B</h1>
+          </section>
+          <section class="stacks">
+            <h1>C</h1>
+          </section>
+          <section class="stacks">
+          </section>
+        </div>
+      `)
+    )
+    t.end()
+  })
+
+  t.test('pop', function (t) {
+    element = stack.update({
+      action: 'pop'
+    })
+    t.equal(
+      strip(element.outerHTML),
+      strip(`
+        <div class="view-stack">
+          <section class="stacks">
+            <h1>A</h1>
+          </section>
+          <section class="stacks">
+            <h1>C</h1>
+          </section>
+          <section class="stacks">
+          </section>
+        </div>
+      `)
+    )
+    t.end()
+  })
+
+  t.test('remove', function (t) {
+    stack.update({
+      action: 'remove',
+      component: (function () {
+      
+      var ac = require('/Users/kj/Documents/work/view-stack/node_modules/yo-yoify/lib/appendChild.js')
+      var bel0 = document.createElement("h1")
+ac(bel0, ["B"])
+      return bel0
+    }())
+    })
+    t.equal(
+      strip(stack().outerHTML),
+      strip(`
+        <div class="view-stack">
+          <section class="stacks">
+          </section>
+          <section class="stacks">
+            <h1>C</h1>
+          </section>
+          <section class="stacks">
+          </section>
+        </div>
+      `)
+    )
+    t.end()
+  })
+
+  t.test('replace', function (t) {
+    stack.update({
+      layer: 'sheets',
+      component: (function () {
+      
+      var ac = require('/Users/kj/Documents/work/view-stack/node_modules/yo-yoify/lib/appendChild.js')
+      var bel0 = document.createElement("h1")
+ac(bel0, ["B"])
+      return bel0
+    }())
+    })
+    t.equal(
+      strip(stack().outerHTML),
+      strip(`
+        <div class="view-stack">
+          <section class="stacks">
+          </section>
+          <section class="stacks">
+            <h1>B</h1>
+          </section>
+          <section class="stacks">
+          </section>
+        </div>
+      `)
+    )
+    t.end()
+  })
+
+})
 
 },{"./":5,"./paths.js":88,"/Users/kj/Documents/work/view-stack/node_modules/yo-yoify/lib/appendChild.js":87,"tape":77}]},{},[89]);

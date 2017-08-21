@@ -10,7 +10,6 @@ view stack signature is:
 ```
 ViewStack({
   paths: Object,
-  path: String,
   store: Function
 })
 ```
@@ -34,13 +33,10 @@ paths: An object that looks like this
 }
 ```
 
-path: `'/a'` the initial url to render
-
-store see [redeux](https://github.com/kristoferjoseph/redeux)
+store: data, also see [redeux](https://github.com/kristoferjoseph/redeux)
 
 ```
 var render = require('view-stack')({
-  path: '/a',
   paths: {
     // name of layer
     screens: {
@@ -56,10 +52,10 @@ var render = require('view-stack')({
      '/c': callback=> {callback(html`<h1>C</h1>`)}
     }
   },
-  store: {}
+  store: { title: 'Yippee!' }
 })
 
-document.body.appendChild(viewStack.element)
+document.body.appendChild(render())
 // Initial view will be component `A`
 // data passed to components will have a navigate method appended.
 // data.navigate('/b') proceeds to next route.

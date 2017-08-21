@@ -26,6 +26,7 @@ test('should parse paths', function(t) {
      }
   })
   t.ok(stack, 'parses paths')
+  stack = null
   t.end()
 })
 
@@ -34,12 +35,14 @@ test('should expose navigate method', function(t) {
   var stack = ViewStack({paths: paths})
   t.ok(stack.navigate, 'navigate method exists')
   t.end()
+  stack = null
 })
 
 test('should expose subscribe method', function(t) {
   var paths = Object.assign({}, require('./paths.js'))
   var stack = ViewStack({paths: paths})
   t.ok(stack.subscribe, 'subscribe method exists')
+  stack = null
   t.end()
 })
 
@@ -62,19 +65,20 @@ test('should render to string from a path', function(t) {
     `),
     'Renders to string from path')
   el.innerHTML = ''
+  stack = null
   t.end()
 })
 
 test('should return element',function(t){
   var paths = Object.assign({}, require('./paths.js'))
-  var element = ViewStack({paths: paths}).element
+  var element = ViewStack({paths: paths})()
   t.ok(element)
   t.end()
 })
 
 test('should create element', function(t) {
   var paths = Object.assign({}, require('./paths.js'))
-  var element = ViewStack({paths: paths, viewClasses:'stack'}).element
+  var element = ViewStack({paths: paths, viewClasses:'stack'})('/a')
   var root = document.getElementById('root')
   root.appendChild(element)
   t.equal(
@@ -95,30 +99,10 @@ test('should create element', function(t) {
   t.end()
 })
 
-test('should always render default screen', function(t) {
-  var paths = Object.assign({}, require('./paths.js'))
-  var element = ViewStack({paths: paths, viewClasses: 'stacks'})('/d')
-  t.equal(
-    strip(element.outerHTML),
-    strip(`
-      <div class="view-stack">
-        <section class="stacks">
-          <h1>A</h1>
-        </section>
-        <section class="stacks">
-        </section>
-        <section class="stacks">
-          <h1>D</h1>
-        </section>
-      </div>
-    `)
-  )
-  t.end()
-})
-
 test('should render multiple layers', function(t) {
   var paths = Object.assign({}, require('./paths.js'))
   var stack = ViewStack({paths: paths, viewClasses: 'stacks'})
+  stack('/a')
   t.equal(
     strip(stack('/c').outerHTML),
     strip(`
@@ -134,7 +118,118 @@ test('should render multiple layers', function(t) {
       </div>
     `)
   )
+  stack = null
   t.end()
 })
 
 
+test('update', function(t) {
+  var paths = Object.assign({}, require('./paths.js'))
+  var stack = ViewStack({paths: paths, viewClasses: 'stacks'})
+  t.ok(stack.update, 'is exported')
+  stack = null
+  t.end()
+})
+
+test('should update a layer', function(t) {
+  var paths = Object.assign({}, require('./paths.js'))
+  var stack = ViewStack({paths: paths, viewClasses: 'stacks'})
+  stack('/a')
+
+  t.test('push', function (t) {
+    stack.update({
+      action: 'push',
+      component: html`
+        <h1>B</h1>
+      `
+    })
+    t.equal(
+      strip(stack('/c').outerHTML),
+      strip(`
+        <div class="view-stack">
+          <section class="stacks">
+            <h1>A</h1>
+            <h1>B</h1>
+          </section>
+          <section class="stacks">
+            <h1>C</h1>
+          </section>
+          <section class="stacks">
+          </section>
+        </div>
+      `)
+    )
+    t.end()
+  })
+
+  t.test('pop', function (t) {
+    element = stack.update({
+      action: 'pop'
+    })
+    t.equal(
+      strip(element.outerHTML),
+      strip(`
+        <div class="view-stack">
+          <section class="stacks">
+            <h1>A</h1>
+          </section>
+          <section class="stacks">
+            <h1>C</h1>
+          </section>
+          <section class="stacks">
+          </section>
+        </div>
+      `)
+    )
+    t.end()
+  })
+
+  t.test('remove', function (t) {
+    stack.update({
+      action: 'remove',
+      component: html`
+        <h1>B</h1>
+      `
+    })
+    t.equal(
+      strip(stack().outerHTML),
+      strip(`
+        <div class="view-stack">
+          <section class="stacks">
+          </section>
+          <section class="stacks">
+            <h1>C</h1>
+          </section>
+          <section class="stacks">
+          </section>
+        </div>
+      `)
+    )
+    t.end()
+  })
+
+  t.test('replace', function (t) {
+    stack.update({
+      layer: 'sheets',
+      component: html`
+        <h1>B</h1>
+      `
+    })
+    t.equal(
+      strip(stack().outerHTML),
+      strip(`
+        <div class="view-stack">
+          <section class="stacks">
+          </section>
+          <section class="stacks">
+            <h1>B</h1>
+          </section>
+          <section class="stacks">
+          </section>
+        </div>
+      `)
+    )
+    t.end()
+  })
+
+})

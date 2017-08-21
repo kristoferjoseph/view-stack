@@ -9,10 +9,9 @@ test('ViewStack', t=> {
 test('should render to string from a path', function(t) {
   var paths = Object.assign({}, require('./paths.js'))
   var stack = ViewStack({
-    path: '/a',
     paths: paths,
     viewClasses:'stack'
   })
-  t.ok(stack.element, stack.element)
+  t.ok(stack(), stack())
   t.end()
 })
