@@ -142,13 +142,12 @@ ac(bel0, ["\n        ",arguments[1],"\n      "])
 
     function load (component) {
       stack[action](component)
+      return render()
     }
 
-    isFunction(component)
+    return isFunction(component)
     ? component(load)
     : load(component)
-
-    return render()
   }
 
   function render (path) {

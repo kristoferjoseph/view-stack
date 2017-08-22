@@ -90,13 +90,12 @@ module.exports = function ViewStack (opts) {
 
     function load (component) {
       stack[action](component)
+      return render()
     }
 
-    isFunction(component)
+    return isFunction(component)
     ? component(load)
     : load(component)
-
-    return render()
   }
 
   function render (path) {
