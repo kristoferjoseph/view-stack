@@ -87,6 +87,7 @@ module.exports = function ViewStack (opts) {
     var layer = state.layer || Object.keys(layers)[0]
     var component = state.component || ''
     var stack = layers[layer]
+    store.params = state.params
 
     function load (component) {
       stack[action](component)
